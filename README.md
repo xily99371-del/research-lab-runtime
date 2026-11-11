@@ -1,4 +1,4 @@
-# Research Lab 4.0
+# Research Lab 4.1
 
 Research Lab is a research-learning workspace combining structured teaching, mathematical derivations, selectable practice tasks, code evaluation, ROS 2 integration checks, and versioned Supabase learning records.
 
@@ -34,9 +34,19 @@ Vercel project: research-lab-learning; root directory: web; Node 22; build comma
 - Readiness is a learning recommendation, not a verified mastery claim. Guided evidence is learner-submitted; only the isolated runner supplies an automatic code verdict.
 
 
-## 自动评测题库 4.0
+## 自动评测题库 4.1
 - Phase one contains 60 unique tasks: 22 original algorithm tasks + 34 new Python/C++ tasks + 4 ROS 2 Python node tasks.
 - New topics include ML training primitives, CNN/BatchNorm, detection metrics/NMS, camera projection, homography, stereo, point-cloud FPS/KNN/voxel/Chamfer, rigid transforms, 3D IoU, tokenizer/rotary/KV cache/contrastive loss, quaternion, occupancy-grid indexing, scalar Kalman update, trajectory metrics, retrieval metrics and paired experiment analysis.
 - Every task has a server-side reference, public examples, randomized hidden cases, numeric comparison tolerances where appropriate, a course mapping and a readiness checklist.
 - The four ROS 2 tasks remain actual ROS 2 Python node contracts. New robotics geometry helpers are Python/C++ algorithm tasks; they are not mislabeled as additional ROS graph/simulator tasks.
 - The online runner still uses the isolated per-submission sandbox. Open-ended model training, GPU benchmarks and full Nav2 simulation are not claimed as supported by this phase.
+
+
+## 递进式题库 4.1
+- 自动评测扩展至100道唯一题目：60道高频算法主线、36道AI/机器人专业题、4道ROS 2系统集成题。
+- 高频算法主线按L1入门、L2基础、L3进阶、L4综合、L5挑战组织；每题标注算法模式、实际应用场景、关联课程与准备度。
+- 新增40道经典算法与数据结构题：哈希、双指针、滑动窗口、单调栈、链表、二叉树、图搜索、回溯、动态规划、贪心和二分等。
+- 题目输入输出契约、边界条件和排序规则明确，支持Python与C++17；每题具有公开案例和随机隐藏测试。
+- AI/机器人专题继续覆盖视觉几何、点云、模型计算、导航和科研评价；ROS 2题保持真实节点集成评测，不与普通算法题混为一谈。
+- 题目列表默认打开核心算法主线，可按学习路线、技术方向、难度和语言筛选；学习者可自由提前挑战，不强制解锁。
+- 构建检查确保100题全部出现在课程导航，并拥有难度等级、课程准备路径和服务端评测入口。
