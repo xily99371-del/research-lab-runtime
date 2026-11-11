@@ -1,6 +1,8 @@
 import {createClient} from '@supabase/supabase-js';
 import {emptyState,normalize,merge3} from './state.js';
 import {PROBLEMS,starter} from './problems.js';
+import {EXPANDED_PROBLEMS} from './expanded-problems.js';
+PROBLEMS.push(...EXPANDED_PROBLEMS);
 import {LESSONS} from './lessons.js';
 import {ADVANCED_LESSONS} from './advanced-lessons.js';
 import {REMAINING_LESSONS} from './remaining-lessons.js';
