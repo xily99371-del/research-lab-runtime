@@ -41,3 +41,4 @@ test('robotics and research metrics have explicit edge cases',()=>{
  assert.ok(Math.abs(referenceAdvanced('average_precision',{ranked:['a','a','b'],relevant:['a','b']})-5/6)<1e-12);
  assert.equal(referenceAdvanced('paired_mean_difference',{baseline:[1,2],method:[2,4]}),1.5);
 });
+test('expanded random generators remain valid over repeated randomized suites',()=>{for(const id of EXPANDED_IDS){for(let i=0;i<30;i++){const input=randomInputAdvanced(id),expected=referenceAdvanced(id,input);assert.equal(matchesAdvanced(id,input,expected,expected),true,id);assert.doesNotThrow(()=>JSON.stringify(expected),id);}}});
