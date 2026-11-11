@@ -12,7 +12,7 @@ test('readiness requires both worked-example check and guided practice evidence'
  let r=taskReadiness('matrix_multiply',progress);
  assert.equal(r.ready,false);assert.equal(r.checksDone,1);assert.equal(r.checksTotal,2);
  assert.deepEqual(nextReadinessStep('matrix_multiply',progress),{courseId:'u9',stage:2,reason:'再完成带提示练习并提交实际结果'});
- progress.u9.learning.evidence={guided:{output:'[11,4]',explanation:'checked'}};
+ progress.u9.learning.evidence={guided:{output:'[11,4]',explanation:'checked',submittedAt:'2026-11-11T00:00:00Z'}};
  r=taskReadiness('matrix_multiply',progress);assert.equal(r.ready,true);assert.equal(r.checksDone,2);assert.equal(nextReadinessStep('matrix_multiply',progress),null);
 });
 test('multi-course tasks require each mapped course and identify the next missing step',()=>{
