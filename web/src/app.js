@@ -13,7 +13,7 @@ const btn=(text,fn,cls='')=>{const b=el('button',text,cls);b.type='button';b.add
 const field=(label,value='',type='text')=>{const l=el('label',label,'field-label'),x=el(type==='textarea'?'textarea':'input');if(type!=='textarea')x.type=type;x.value=value;x.className='field';l.append(x);return {l,x};};
 const note=(text,kind='')=>el('div',text,'notice '+kind);
 let sb,config,user=null,session=null,courses=[],data=emptyState(),base=emptyState(),version=0,dirty=false,inFlight=false,pendingConflict=null,jobs=[];
-let epoch=0,revision=0,timer,toastTimer,page='dashboard',selectedCourse='u32',track='\u5168\u90e8',courseQuery='',selectedTask='attention',taskTrack='\u5168\u90e8',taskLevel='\u5168\u90e8',taskQuery='',language='python',running=false;
+let epoch=0,revision=0,timer,toastTimer,page='dashboard',selectedCourse='u49',track='\u5168\u90e8',courseQuery='',selectedTask='attention',taskTrack='\u5168\u90e8',taskLevel='\u5168\u90e8',taskQuery='',language='python',running=false;
 const cacheKey=()=> 'research-lab-v34:'+(user?.id||'guest');
 function cache(){try{localStorage.setItem(cacheKey(),JSON.stringify({data,base,version,dirty}));}catch{setBanner('\u672c\u673a\u5b58\u50a8\u7a7a\u95f4\u4e0d\u8db3\uff0c\u8bf7\u5148\u5bfc\u51fa\u5907\u4efd\u3002','warn');}}
 function loadCache(){data=emptyState();base=emptyState();version=0;dirty=false;try{const c=JSON.parse(localStorage.getItem(cacheKey())||'null');if(c){data=normalize(c.data);base=normalize(c.base);version=Number(c.version)||0;dirty=!!c.dirty;}}catch{}}
@@ -45,29 +45,29 @@ u3:'\\(f(n)=g(n)+h(n)\\), \\(h(n)\\le h^*(n)\\)',
 u4:'\\(dp[i,c]=\\max(dp[i-1,c],dp[i-1,c-w_i]+v_i)\\)',
 u9:'\\(A=U\\Sigma V^T\\), \\(\\operatorname{rank}(A)+\\operatorname{nullity}(A)=n\\)',
 u10:'\\(\\hat\\theta_{MLE}=\\arg\\max_\\theta\\sum_i\\log p(x_i\\mid\\theta)\\)',
-u11:'\\(Gini=1-\\sum_k p_k^2\\)',
-u12:'\\(\\frac{\\partial L}{\\partial W}=\\delta x^T\\), \\(\\frac{\\partial L}{\\partial x}=W^T\\delta\\)',
-u13:'\\(\\theta_{t+1}=\\theta_t-\\eta\\nabla_\\theta L(\\theta_t)\\)',
-u14:'\\(H_{out}=\\lfloor\\frac{H+2P-D(K-1)-1}{S}+1\\rfloor\\)',
-u15:'\\(R(\\theta)=\\mathbb E_{(x,y)\\sim P}[\\ell(f_\\theta(x),y)]\\)',
-u21:'\\(M=\\sum_{x,y}w(x,y)\\begin{bmatrix}I_x^2&I_xI_y\\\\I_xI_y&I_y^2\\end{bmatrix}\\)',
-u22:'\\(\\lambda\\begin{bmatrix}u\\\\v\\\\1\\end{bmatrix}=K[R\\mid t]\\begin{bmatrix}X\\\\Y\\\\Z\\\\1\\end{bmatrix}\\)',
-u23:'\\(x_2^T F x_1=0\\), \\(E=K_2^T F K_1\\)',
-u24:'\\(IoU=\\frac{|B_p\\cap B_g|}{|B_p\\cup B_g|}\\)',
-u26:'\\(Attention(Q,K,V)=softmax(\\frac{QK^T}{\\sqrt{d_k}})V\\)',
-u27:'\\(Recall@K=\\frac{1}{N}\\sum_i\\mathbf 1[gt_i\\in TopK(q_i)]\\)',
-u29:'\\(f(\\{x_i\\})=\\gamma(\\max_i\\phi(x_i))\\)',
-u30:'\\(\\hat C(r)=\\sum_i T_i(1-e^{-\\sigma_i\\delta_i})c_i\\)',
-u32:'\\(Attention(Q,K,V)=softmax(\\frac{QK^T}{\\sqrt{d_k}})V\\)',
-u33:'\\(\\mathcal L_{AR}=-\\sum_t\\log p_\\theta(x_t\\mid x_{<t})\\)',
-u36:'\\(W=W_0+\\frac{\\alpha}{r}BA\\), \\(r\\ll\\min(d,k)\\)',
-u37:'\\(\\mathcal L_{i\\to t}=-\\log\\frac{e^{s_{ii}/\\tau}}{\\sum_j e^{s_{ij}/\\tau}}\\)',
-u38:'\\(Z_v=P(E_v(I))\\in\\mathbb R^{N_v\\times d_{LLM}}\\)',
-u42:'\\(s_{t+1}=T(s_t,a_t,o_{t+1})\\)',
-u46:'\\(T_{world}^{sensor}=\\begin{bmatrix}R&t\\\\0&1\\end{bmatrix}\\)',
-u49:'\\(\\min_{X}\\sum_{(i,j)}\\|r_{ij}(X_i,X_j)\\|_{\\Omega_{ij}}^2\\)',
-u50:'\\(f(n)=g(n)+h(n)\\), \\(h(n)\\le h^*(n)\\)',
-u53:'\\(\\Delta=\\frac{1}{S}\\sum_{s=1}^S(M_s^{A}-M_s^{B})\\)'
+u17:'\\(Gini=1-\\sum_k p_k^2\\)',
+u20:'\\(\\frac{\\partial L}{\\partial W}=\\delta x^T\\), \\(\\frac{\\partial L}{\\partial x}=W^T\\delta\\)',
+u21:'\\(\\theta_{t+1}=\\theta_t-\\eta\\nabla_\\theta L(\\theta_t)\\)',
+u22:'\\(H_{out}=\\lfloor\\frac{H+2P-D(K-1)-1}{S}+1\\rfloor\\)',
+u26:'\\(R(\\theta)=\\mathbb E_{(x,y)\\sim P}[\\ell(f_\\theta(x),y)]\\)',
+u31:'\\(M=\\sum_{x,y}w(x,y)\\begin{bmatrix}I_x^2&I_xI_y\\\\I_xI_y&I_y^2\\end{bmatrix}\\)',
+u32:'\\(\\lambda\\begin{bmatrix}u\\\\v\\\\1\\end{bmatrix}=K[R\\mid t]\\begin{bmatrix}X\\\\Y\\\\Z\\\\1\\end{bmatrix}\\)',
+u33:'\\(x_2^T F x_1=0\\), \\(E=K_2^T F K_1\\)',
+u34:'\\(IoU=\\frac{|B_p\\cap B_g|}{|B_p\\cup B_g|}\\)',
+u36:'\\(Attention(Q,K,V)=softmax(\\frac{QK^T}{\\sqrt{d_k}})V\\)',
+u37:'\\(Recall@K=\\frac{1}{N}\\sum_i\\mathbf 1[gt_i\\in TopK(q_i)]\\)',
+u39:'\\(f(\\{x_i\\})=\\gamma(\\max_i\\phi(x_i))\\)',
+u40:'\\(\\hat C(r)=\\sum_i T_i(1-e^{-\\sigma_i\\delta_i})c_i\\)',
+u49:'\\(Attention(Q,K,V)=softmax(\\frac{QK^T}{\\sqrt{d_k}})V\\)',
+u50:'\\(\\mathcal L_{AR}=-\\sum_t\\log p_\\theta(x_t\\mid x_{<t})\\)',
+u53:'\\(W=W_0+\\frac{\\alpha}{r}BA\\), \\(r\\ll\\min(d,k)\\)',
+u54:'\\(\\mathcal L_{i\\to t}=-\\log\\frac{e^{s_{ii}/\\tau}}{\\sum_j e^{s_{ij}/\\tau}}\\)',
+u55:'\\(Z_v=P(E_v(I))\\in\\mathbb R^{N_v\\times d_{LLM}}\\)',
+u57:'\\(s_{t+1}=T(s_t,a_t,o_{t+1})\\)',
+u72:'\\(T_{world}^{sensor}=\\begin{bmatrix}R&t\\\\0&1\\end{bmatrix}\\)',
+u75:'\\(\\min_{X}\\sum_{(i,j)}\\|r_{ij}(X_i,X_j)\\|_{\\Omega_{ij}}^2\\)',
+u76:'\\(f(n)=g(n)+h(n)\\), \\(h(n)\\le h^*(n)\\)',
+u86:'\\(\\Delta=\\frac{1}{S}\\sum_{s=1}^S(M_s^{A}-M_s^{B})\\)'
 };
 
 function renderDashboard(root){root.append(hero('\u628a\u5b66\u4e60\u53d8\u6210\u53ef\u4ee5\u68c0\u67e5\u7684\u80fd\u529b\u3002','\u8bfe\u7a0b\u4e0d\u518d\u53ea\u662f\u76ee\u5f55\uff1a\u6bcf\u4e2a\u77e5\u8bc6\u5355\u5143\u90fd\u6709\u5b66\u4e60\u76ee\u6807\u3001\u8bb2\u89e3\u3001\u63a8\u5bfc\u6216\u7b97\u6cd5\u6293\u624b\u3001\u5b9e\u73b0\u4efb\u52a1\u548c\u7814\u7a76\u5ef6\u4f38\u3002\u4efb\u52a1\u4e2d\u5fc3\u652f\u6301\u6309\u65b9\u5411\u3001\u96be\u5ea6\u3001\u8bed\u8a00\u548c\u5173\u952e\u8bcd\u9009\u62e9\u8bad\u7ec3\u3002'));const mastered=Object.values(data.progress).filter(x=>x?.theory&&x?.implementation&&x?.research).length;root.append(box('grid stats',...[[courses.length,'\u8bfe\u7a0b\u5355\u5143'],[Object.keys(LESSONS).length,'\u8be6\u7ec6\u8bb2\u89e3\u5355\u5143'],[PROBLEMS.length,'\u53ef\u9009\u8bc4\u6d4b\u4efb\u52a1'],[mastered,'\u5b8c\u6210\u4e09\u7ef4\u9a8c\u6536']].map(([n,t])=>box('card stat',el('small',t),el('b',String(n))))));root.append(note('\u5b66\u4e60\u72b6\u6001\u5206\u4e09\u5c42\uff1a\u7406\u8bba\u81ea\u8bc4\u3001\u4ee3\u7801\u884c\u4e3a\u8bc4\u6d4b\u3001\u7814\u7a76\u8bc1\u636e\u3002\u81ea\u52a8\u6d4b\u8bd5\u53ea\u68c0\u67e5\u7a0b\u5e8f\u884c\u4e3a\uff1b\u590d\u6742\u5ea6\u8bc1\u660e\u3001\u6e90\u7801\u7406\u89e3\u548c\u79d1\u7814\u521b\u65b0\u4ecd\u9700\u8bb2\u89e3\u4e0e\u7b54\u8fa9\u5f0f\u9a8c\u6536\u3002'));root.append(heading('\u516d\u5927\u5b66\u4e60\u65b9\u5411','\u9009\u62e9\u65b9\u5411\u8fdb\u5165\u8bfe\u7a0b\u4e0e\u4efb\u52a1'));root.append(box('grid three',...tracks().map(t=>{const cs=courses.filter(c=>c.track===t),done=cs.filter(c=>{const p=data.progress[c.id]||{};return p.theory&&p.implementation&&p.research;}).length;return box('card track-card',el('strong',t),el('span',done+'/'+cs.length+' \u4e2a\u5355\u5143\u5b8c\u6210\u9a8c\u6536','muted'),box('bar',Object.assign(el('i'),{style:'width:'+(cs.length?done/cs.length*100:0)+'%'})),btn('\u8fdb\u5165\u8bfe\u7a0b',()=>{track=t;navigate('courses');}));})));root.append(heading('\u63a8\u8350\u7ee7\u7eed\u5b66\u4e60','\u7ed3\u5408\u5f53\u524d\u65b9\u5411\u548c\u8bc4\u6d4b\u4efb\u52a1'));const next=courses.find(c=>!data.progress[c.id]?.theory)||courses[0];if(next)root.append(box('card',el('span',next.track,'pill blue'),el('h3',next.title),el('p',next.summary,'muted'),btn('\u6253\u5f00\u672c\u8282\u8bb2\u89e3',()=>{selectedCourse=next.id;navigate('courses');},'primary')));root.append(box('grid two',box('card',el('h3','\u4efb\u52a1\u4e2d\u5fc3'),el('p','\u5f53\u524d\u53ef\u9009 '+PROBLEMS.length+' \u4e2a\u7b97\u6cd5\u4e0e ROS 2 \u4efb\u52a1\uff0c\u652f\u6301\u6309\u4e3b\u9898\u548c\u96be\u5ea6\u7b5b\u9009\u3002','muted'),btn('\u9009\u62e9\u8bad\u7ec3\u4efb\u52a1',()=>navigate('code'))),box('card',el('h3','\u7814\u7a76\u5de5\u4f5c\u53f0'),el('p','\u8bb0\u5f55\u7814\u7a76\u95ee\u9898\u3001\u53ef\u8bc1\u4f2a\u5047\u8bbe\u3001\u57fa\u7ebf\u3001\u53d8\u91cf\u3001\u7ed3\u679c\u548c\u5931\u8d25\u6848\u4f8b\u3002','muted'),btn('\u8bb0\u5f55\u7814\u7a76\u8fdb\u5c55',()=>navigate('research')))));}
