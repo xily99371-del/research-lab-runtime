@@ -5,6 +5,8 @@ import {reference,matches,suite,ALGORITHMS,ROS} from '../lib/tasks.js';
 import {PROBLEMS} from '../src/problems.js';
 import {LESSONS} from '../src/lessons.js';
 import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
+import {REMAINING_LESSONS} from '../src/remaining-lessons.js';
+import {ROS_MIDDLEWARE_LESSON} from '../src/ros-middleware-lesson.js';
 import fs from 'node:fs';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 test('workspace normalization and safe keys',()=>{assert.deepEqual(normalize(null),emptyState());assert.deepEqual(normalize({papers:'bad'}).papers,[]);assert.equal(normalize({progress:{'__proto__':{x:1}}}).progress.x,undefined);});
@@ -18,3 +20,5 @@ test('attention mask produces finite zero row',()=>assert.deepEqual(reference('a
 test('math lessons exist and expose sections',()=>{const all={...LESSONS,...ADVANCED_LESSONS};assert.ok(Object.keys(all).length>=20);for(const [id,l] of Object.entries(all)){assert.ok(l.sections.length>=3,id);assert.ok(l.questions.length>=2,id);}});
 
 test('lesson IDs match course titles after curriculum repair',()=>{const all={...LESSONS,...ADVANCED_LESSONS};assert.match(all.u49.title,/Attention/);assert.match(all.u53.title,/LoRA/);assert.match(all.u70.title,/ROS/);assert.match(all.u72.title,/TF2/);assert.match(all.u86.title,/\u5b9e\u9a8c/);assert.match(all.u17.title,/\u51b3\u7b56\u6811/);assert.match(all.u20.title,/\u53cd\u5411\u4f20\u64ad/);assert.match(all.u31.title,/\u4f20\u7edf\u89c6\u89c9/);assert.match(all.u32.title,/\u76f8\u673a\u6a21\u578b/);assert.match(all.u36.title,/Vision Transformer/);assert.match(all.u37.title,/VPR/);assert.match(all.u39.title,/\u70b9\u4e91/);assert.match(all.u40.title,/\u4e09\u7ef4\u91cd\u5efa/);assert.match(all.u50.title,/LLM/);assert.match(all.u54.title,/CLIP/);assert.match(all.u55.title,/VLM/);assert.match(all.u57.title,/Agent/);assert.match(all.u75.title,/SLAM/);assert.match(all.u76.title,/Nav2/);});
+
+test('all 96 curriculum units now have complete lesson records',()=>{const all={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};assert.equal(Object.keys(all).length,96);for(const c of courses){const l=all[c.id];assert.ok(l,'missing lesson '+c.id);assert.ok(l.title&&l.title.length>2,c.id);assert.ok(l.formula&&l.formula.includes('\\('),c.id);assert.ok(l.sections.length>=4,c.id);assert.ok(l.questions.length>=4,c.id);assert.ok(l.links.length>=1,c.id);assert.ok(l.tasks.length>=1,c.id);for(const section of l.sections){assert.ok(section[0].length>2,c.id);assert.ok(section[1].length>100,c.id);}}});
