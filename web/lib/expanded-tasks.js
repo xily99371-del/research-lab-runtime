@@ -44,8 +44,8 @@ export function referenceAdvanced(id,d){
  case 'occupancy_grid_index':{const col=Math.floor((d.x-d.origin[0])/d.resolution),row=Math.floor((d.y-d.origin[1])/d.resolution);return row>=0&&row<d.height&&col>=0&&col<d.width?[row,col]:null;}
  case 'ekf_scalar_update':{const gain=d.variance/(d.variance+d.R),mean=d.mean+gain*(d.z-d.mean),variance=(1-gain)*d.variance;return {mean,variance,gain};}
  case 'path_length':return d.points.slice(1).reduce((s,p,i)=>s+Math.sqrt(dist2(p,d.points[i])),0);
- case 'recall_at_k':{const rel=new Set(d.relevant),hit=d.ranked.slice(0,d.k).filter(x=>rel.has(x)).length;return rel.size?hit/rel.size:0;}
- case 'average_precision':{const rel=new Set(d.relevant);if(!rel.size)return 0;let hit=0,sum=0;d.ranked.forEach((x,i)=>{if(rel.has(x)){hit++;sum+=hit/(i+1);}});return sum/rel.size;}
+ case 'recall_at_k':{const rel=new Set(d.relevant),seen=new Set(d.ranked.slice(0,d.k)),hit=[...rel].filter(x=>seen.has(x)).length;return rel.size?hit/rel.size:0;}
+ case 'average_precision':{const rel=new Set(d.relevant);if(!rel.size)return 0;let hit=0,sum=0;const seen=new Set();d.ranked.forEach((x,i)=>{if(rel.has(x)&&!seen.has(x)){seen.add(x);hit++;sum+=hit/(i+1);}});return sum/rel.size;}
  case 'paired_mean_difference':if(d.baseline.length!==d.method.length||!d.baseline.length)return null;return d.method.reduce((s,x,i)=>s+x-d.baseline[i],0)/d.method.length;
  default:throw new Error('Unknown expanded task '+id);
  }
@@ -97,7 +97,7 @@ export function randomInputAdvanced(id){
  case 'batch_norm_inference':{const c=ri(1,4),n=ri(1,5);return {x:Array.from({length:n},()=>vec(c)),gamma:vec(c),beta:vec(c),mean:vec(c),var:vec(c,0,4).map(x=>Math.abs(x)),eps:1e-5};}
  case 'conv2d_valid':{const h=ri(3,6),w=ri(3,6),kh=ri(1,Math.min(3,h)),kw=ri(1,Math.min(3,w));return {image:Array.from({length:h},()=>vec(w)),kernel:Array.from({length:kh},()=>vec(kw)),stride:ri(1,2)};}
  case 'kmeans_assign':{const n=ri(2,10),k=ri(1,Math.min(4,n));return {points:pts(n,2),centers:pts(k,2)};}
- case 'iou_xyxy':{const a=vec(4).map((x,i)=>x+(i>=2?4:0)),b=vec(4).map((x,i)=>x+(i>=2?4:0));return {a,b};}
+ case 'iou_xyxy':{const box=()=>{const x=ri(-5,5),y=ri(-5,5);return [x,y,x+ri(1,5),y+ri(1,5)];};return {a:box(),b:box()};}
  case 'nms':{const n=ri(1,12),boxes=Array.from({length:n},()=>{const x=ri(0,8),y=ri(0,8),w=ri(1,4),h=ri(1,4);return [x,y,x+w,y+h];});return {boxes,scores:vec(n,0,10),threshold:.5};}
  case 'project_point':return {point:[ri(-3,3),ri(-3,3),ri(1,8)],fx:100,fy:120,cx:50,cy:40};
  case 'unproject_point':return {pixel:[ri(0,100),ri(0,80)],depth:ri(1,10),fx:100,fy:120,cx:50,cy:40};
