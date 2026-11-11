@@ -114,7 +114,7 @@ function randomHot(id){
  case 'longest_substring':case 'longest_palindrome':return {text:Array.from({length:ri(0,15)},()=> 'abcde'[ri(0,4)]).join('')};
  case 'container_water':return {height:ints(ri(0,12),0,12)};
  case 'rotate_array':return {nums:ints(ri(0,12)),k:ri(0,20)};
- case 'valid_anagram':{const s=Array.from({length:ri(0,10)},()=> 'abc'[ri(0,2)]).join('');return {s,t:Math.random()<.5?s:Array.from(s).reverse().join('')};}
+ case 'valid_anagram':{const s=Array.from({length:ri(0,10)},()=> 'abc'[ri(0,2)]).join('');const t=ri(0,1)?s:Array.from(s+'x').reverse().join('');return {s,t};}
  case 'group_anagrams':return {words:Array.from({length:ri(0,10)},()=>Array.from({length:ri(0,5)},()=> 'abc'[ri(0,2)]).join(''))};
  case 'subarray_sum':return {nums:ints(ri(0,12)),k:ri(-5,8)};
  case 'min_stack':return {ops:[['push',ri(-5,5)],['push',ri(-5,5)],['getMin'],['top'],['pop'],['getMin']]};
@@ -129,7 +129,7 @@ function randomHot(id){
  case 'number_of_islands':{const h=ri(1,5),w=ri(1,5);return {grid:Array.from({length:h},()=>Array.from({length:w},()=>ri(0,1)).join(''))};}
  case 'rotting_oranges':{const h=ri(1,4),w=ri(1,4);return {grid:Array.from({length:h},()=>Array.from({length:w},()=>ri(0,2)))};}
  case 'course_schedule':{const n=ri(1,7),pairs=[];for(let i=0;i<ri(0,10);i++)pairs.push([ri(0,n-1),ri(0,n-1)]);return {numCourses:n,prerequisites:pairs};}
- case 'subsets':case 'permutations':return {nums:ints(ri(0,6),0,8)};
+ case 'subsets':case 'permutations':return {nums:[...new Set(ints(ri(0,6),0,20))]};
  case 'combination_sum':{const candidates=[...new Set(ints(ri(1,5),1,8))].sort((a,b)=>a-b);return {candidates,target:ri(1,18)};}
  case 'word_search':{const h=ri(1,4),w=ri(1,4),board=Array.from({length:h},()=>Array.from({length:w},()=> 'ABC'[ri(0,2)]).join(''));return {board,word:Array.from({length:ri(1,5)},()=> 'ABC'[ri(0,2)]).join('')};}
  case 'search_rotated':case 'find_min_rotated':{const a=[...new Set(ints(ri(1,10),0,20))].sort((a,b)=>a-b),k=ri(0,a.length-1),nums=[...a.slice(k),...a.slice(0,k)];return id==='search_rotated'?{nums,target:ri(0,20)}:{nums};}
@@ -142,5 +142,5 @@ function randomHot(id){
  }
 }
 export function matchesHot(id,d,a,e){
- const eq=(x,y)=>{if(typeof x==='number'&&typeof y==='number')return Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<=1e-7+1e-7*Math.abs(y);if(Array.isArray(x)||Array.isArray(y)){if(!Array.isArray(x)||!Array.isArray(y)||x.length!==y.length)return false;if(id==='longest_palindrome')return typeof a==='string'&&Array.from(a).length===Array.from(e).length&&Array.from(a).join('')===Array.from(a).reverse().join('')&&Array.from(a).length>=Array.from(e).length; if(['three_sum','group_anagrams','subsets','permutations','combination_sum'].includes(id)){const key=v=>JSON.stringify(v);return [...x].map(key).sort().join('|')===[...y].map(key).sort().join('|');}return x.every((v,i)=>eq(v,y[i]));}if(x&&y&&typeof x==='object'&&typeof y==='object')return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>k in y&&eq(x[k],y[k]));return x===y;};return eq(a,e);
+ const eq=(x,y)=>{if(typeof x==='number'&&typeof y==='number')return Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<=1e-7+1e-7*Math.abs(y);if(Array.isArray(x)||Array.isArray(y)){if(!Array.isArray(x)||!Array.isArray(y)||x.length!==y.length)return false;if(id==='longest_palindrome')return a===e; if(['three_sum','group_anagrams','subsets','permutations','combination_sum'].includes(id)){const key=v=>JSON.stringify(v);return [...x].map(key).sort().join('|')===[...y].map(key).sort().join('|');}return x.every((v,i)=>eq(v,y[i]));}if(x&&y&&typeof x==='object'&&typeof y==='object')return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>k in y&&eq(x[k],y[k]));return x===y;};return eq(a,e);
 }
