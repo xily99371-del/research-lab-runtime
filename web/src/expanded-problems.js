@@ -2,7 +2,7 @@ const py='def solve(data):\n    # Return a JSON-serializable result.\n    raise 
 const item=(id,title,track,level,desc,example,unit,concept)=>({id,title,track,level,langs:['python','cpp'],desc,example,unit,concept,starter:py});
 export const EXPANDED_PROBLEMS=[
 item('softmax','Softmax：稳定归一化与数值溢出','机器学习与深度学习','基础','实现一维稳定Softmax。输入 data={logits}，返回同长度概率数组；极大logit不能溢出，概率和应为1。','logits=[1,2,3] → [0.0900306,0.2447285,0.6652409]','u20','减去最大值不改变归一化结果；同时检查平移不变性、单元素输入与极端数值。'),
-item('linear_regression_step','线性回归：手写一次梯度下降','机器学习与深度学习','基础','data={x,y,w,b,lr}。模型ŷ=wx+b，损失L=0.5(ŷ−y)^2。返回 [w_new,b_new,L_before]。','x=2,y=4,w=0,b=0,lr=0.1 → [-?]','u16','分别计算对w和b的梯度；不要把损失值误当梯度。'),
+item('linear_regression_step','线性回归：手写一次梯度下降','机器学习与深度学习','基础','data={x,y,w,b,lr}。模型ŷ=wx+b，损失L=0.5(ŷ−y)^2。返回 [w_new,b_new,L_before]。','x=2,y=4,w=0,b=0,lr=0.1 → [0.8,0.4,8]','u16','分别计算对w和b的梯度；不要把损失值误当梯度。'),
 item('binary_cross_entropy','二元交叉熵：概率裁剪与批量平均','机器学习与深度学习','进阶','data={y,p}，y为0/1标签，p为预测概率。返回平均二元交叉熵；概率按[1e-12,1−1e-12]裁剪。','y=[1,0],p=[0.9,0.1] → 0.1053605','u16','区分logits与概率输入，处理极端概率，并验证标签与预测长度。'),
 item('confusion_matrix','混淆矩阵：类别映射与统计','机器学习与深度学习','基础','data={y_true,y_pred,labels}。返回二维矩阵，行是真实类别，列是预测类别，类别顺序严格按labels。','y_true=[0,1,1,0],y_pred=[0,1,0,0],labels=[0,1] → [[2,0],[1,1]]','u23','不能假设类别标签从0连续编号；检查类别顺序、缺失类和错分方向。'),
 item('batch_norm_inference','BatchNorm：推理态逐通道归一化','机器学习与深度学习','进阶','data={x,gamma,beta,mean,var,eps}，x为N×C。按通道使用运行均值方差，返回N×C数组。','x=[[1,2]],gamma=[1,1],beta=[0,0],mean=[0,0],var=[1,1],eps=0 → [[1,2]]','u22','这是推理态公式；不要用当前batch统计量替代运行统计量。'),
