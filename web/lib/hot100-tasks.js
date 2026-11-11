@@ -22,7 +22,7 @@ export function referenceHot(id,d){
  switch(id){
  case 'three_sum':{const a=[...d.nums].sort((x,y)=>x-y),out=[];for(let i=0;i<a.length-2;i++){if(i&&a[i]===a[i-1])continue;let l=i+1,r=a.length-1;while(l<r){const s=a[i]+a[l]+a[r];if(s===0){out.push([a[i],a[l],a[r]]);const x=a[l],y=a[r];while(l<r&&a[l]===x)l++;while(l<r&&a[r]===y)r--;}else if(s<0)l++;else r--;}}return out;}
  case 'longest_substring':{const s=Array.from(d.text),last=new Map();let left=0,best=0;for(let r=0;r<s.length;r++){if(last.has(s[r]))left=Math.max(left,last.get(s[r])+1);last.set(s[r],r);best=Math.max(best,r-left+1);}return best;}
- case 'product_except_self':{const a=d.nums,n=a.length,out=Array(n).fill(1),p=1;for(let i=0;i<n;i++){out[i]=p;p*=a[i];}let q=1;for(let i=n-1;i>=0;i--){out[i]*=q;q*=a[i];}return out;}
+ case 'product_except_self':{const a=d.nums,n=a.length,out=Array(n).fill(1);let p=1;for(let i=0;i<n;i++){out[i]=p;p*=a[i];}let q=1;for(let i=n-1;i>=0;i--){out[i]*=q;q*=a[i];}return out;}
  case 'container_water':{const a=d.height;let l=0,r=a.length-1,b=0;while(l<r){b=Math.max(b,Math.min(a[l],a[r])*(r-l));if(a[l]<a[r])l++;else r--;}return b;}
  case 'move_zeroes':{const a=[...d.nums],v=a.filter(x=>x!==0);return [...v,...Array(a.length-v.length).fill(0)];}
  case 'rotate_array':{const a=d.nums,n=a.length;if(!n)return[];const k=((d.k%n)+n)%n;return [...a.slice(n-k),...a.slice(0,n-k)];}
