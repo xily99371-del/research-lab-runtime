@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-pip pyt
 RUN python3 -m pip install --break-system-packages --no-cache-dir fastapi==0.115.12 'uvicorn[standard]==0.34.0' pydantic==2.11.3
 RUN useradd --create-home --uid 10001 evaluator
 COPY app /opt/ros-evaluator/app
+COPY web /opt/ros-evaluator/web
 RUN chown -R evaluator:evaluator /opt/ros-evaluator
 USER evaluator
 EXPOSE 8080
