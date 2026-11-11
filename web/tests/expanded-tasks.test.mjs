@@ -7,7 +7,7 @@ import {TASK_PATHS} from '../src/guided/assessment-path.js';
 test('phase-one bank has exactly 60 unique tasks and covers 34 new IDs',()=>{
  assert.equal(EXPANDED_IDS.length,34);assert.equal(EXPANDED_PROBLEMS.length,34);
  const all=[...PROBLEMS,...EXPANDED_PROBLEMS];assert.equal(all.length,60);assert.equal(new Set(all.map(x=>x.id)).size,60);
- assert.equal(ALGORITHMS.length,56);assert.equal(ROS.length,4);
+ assert.equal(ALGORITHMS.length,96);assert.equal(ROS.length,4);
 });
 test('every expanded task has course mapping, Python/C++ contract and non-empty test suite',()=>{
  for(const id of EXPANDED_IDS){const p=EXPANDED_PROBLEMS.find(x=>x.id===id);assert.ok(p,id);assert.deepEqual(p.langs,['python','cpp'],id);assert.ok(TASK_PATHS[id]?.courses.length,id);assert.ok(suite(id).length>=17,id);}
