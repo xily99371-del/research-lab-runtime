@@ -2,8 +2,9 @@ import {createClient} from '@supabase/supabase-js';
 import {emptyState,normalize,merge3} from './state.js';
 import {PROBLEMS,starter} from './problems.js';
 import {EXPANDED_PROBLEMS} from './expanded-problems.js';
+import {HOT_PROBLEMS} from './hot100-problems.js';
 import {TASK_PROGRESSIONS,TASK_META} from './task-progressions.js';
-PROBLEMS.push(...EXPANDED_PROBLEMS);
+PROBLEMS.push(...EXPANDED_PROBLEMS,...HOT_PROBLEMS);
 import {LESSONS} from './lessons.js';
 import {ADVANCED_LESSONS} from './advanced-lessons.js';
 import {REMAINING_LESSONS} from './remaining-lessons.js';
@@ -101,7 +102,7 @@ function renderCode(root){
  if(taskMode==='project'){renderLearningPractice(root,context());return;}
  const filter=(values,current,label,callback)=>{const s=el('select');s.setAttribute('aria-label',label);for(const value of values){const o=el('option',value);s.append(o);}s.value=current;s.onchange=()=>{callback(s.value);render();};return s;};
  const search=el('input');search.id='code-search';search.placeholder='搜索题目、输入输出或概念';search.value=taskQuery;const searchUpdate=e=>{if(e.isComposing)return;taskQuery=search.value;rerenderWithFocus('code-search');};search.oninput=searchUpdate;search.oncompositionend=searchUpdate;
- root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'评测方向',v=>taskTrack=v),filter(['全部',...TASK_PROGRESSIONS.map(x=>x.title)],taskPath,'递进训练路径',v=>taskPath=v),filter(['全部','基础','进阶','研究级'],taskLevel,'原始难度标签',v=>taskLevel=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
+ root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'评测方向',v=>taskTrack=v),filter(['全部',...TASK_PROGRESSIONS.map(x=>x.title)],taskPath,'递进训练路径',v=>taskPath=v),filter(['全部','入门','基础','进阶','综合挑战','研究级'],taskLevel,'原始难度标签',v=>taskLevel=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
  const langKey={'Python':'python','C++17':'cpp','ROS 2 Python':'ros2_python'};
  const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskPath==='全部'||TASK_META[p.id]?.pathTitle===taskPath)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept+' '+(TASK_META[p.id]?.application||'')).toLowerCase().includes(taskQuery.toLowerCase())).sort((a,b)=>{if(taskPath==='全部')return 0;return (TASK_META[a.id]?.stage||99)-(TASK_META[b.id]?.stage||99);});
  if(!ps.some(p=>p.id===selectedTask))selectedTask=ps[0]?.id;
