@@ -2,6 +2,7 @@ import {createClient} from '@supabase/supabase-js';
 import {emptyState,normalize,merge3} from './state.js';
 import {PROBLEMS,starter} from './problems.js';
 import {EXPANDED_PROBLEMS} from './expanded-problems.js';
+import {TASK_PROGRESSIONS,TASK_META} from './task-progressions.js';
 PROBLEMS.push(...EXPANDED_PROBLEMS);
 import {LESSONS} from './lessons.js';
 import {ADVANCED_LESSONS} from './advanced-lessons.js';
@@ -24,7 +25,7 @@ const field=(label,value='',type='text',id='')=>{const l=el('label',label,'learn
 const note=(text,kind='')=>el('div',text,'notice '+kind);
 const hero=(h,p)=>box('hero',el('small','PERSONAL RESEARCH WORKSPACE'),el('h2',h),el('p',p));
 let sb=null,config=null,user=null,session=null,courses=[],data=emptyState(),base=emptyState(),version=0,dirty=false,inFlight=false,pendingConflict=null,jobs=[];
-let epoch=0,revision=0,timer=null,toastTimer=null,page='dashboard',selectedTask='attention',taskTrack='全部',taskLevel='全部',taskLang='全部',taskQuery='',language='python',taskMode='code',running=false;
+let epoch=0,revision=0,timer=null,toastTimer=null,page='dashboard',selectedTask='attention',taskTrack='全部',taskLevel='全部',taskPath='全部',taskLang='全部',taskQuery='',language='python',taskMode='code',running=false;
 const reports=new Map();
 // Keep the old cache namespace so guest drafts and logged-in offline edits survive.
 const cacheKey=()=> 'research-lab-v34:'+(user?.id||'guest');
@@ -95,20 +96,20 @@ function reportView(report){const human=humanizeReport(report),wrap=box('learn-r
  for(const c of report.cases||[]){const d=el('details',null,'learn-details');d.append(el('summary',(c.pass?'✓ ':'× ')+(c.name||c.test||'测试')));if(c.input!==undefined)d.append(el('pre',JSON.stringify({input:c.input,expected:c.expected,actual:c.actual},null,2),'code-output'));else d.append(el('p','隐藏测试只展示结果，不泄露完整输入与答案。','muted'));wrap.append(d);}
  const raw=el('details',null,'learn-details');raw.append(el('summary','查看原始评测报告'),el('pre',JSON.stringify(report,null,2),'code-output'));wrap.append(raw);return wrap;}
 function renderCode(root){
- root.append(hero('任务中心：选择练习方式，再开始动手。','课程实践按五个阶段逐步推进；26道在线题目由隔离运行器检查程序行为。开放实验提交代码、实际结果与解释，不伪装成自动评分。'));
+ root.append(hero('任务中心：按知识路径逐级训练。','从高频基础题到真实AI、视觉与机器人模块；每道题都有明确应用背景、分级目标和自动测试。'));
  root.append(box('actions',btn('自动评测任务（'+PROBLEMS.length+'）',()=>{taskMode='code';render();},taskMode==='code'?'primary':''),btn('课程实践任务（'+courses.length+'）',()=>{taskMode='project';render();},taskMode==='project'?'primary':'')));
  if(taskMode==='project'){renderLearningPractice(root,context());return;}
  const filter=(values,current,label,callback)=>{const s=el('select');s.setAttribute('aria-label',label);for(const value of values){const o=el('option',value);s.append(o);}s.value=current;s.onchange=()=>{callback(s.value);render();};return s;};
  const search=el('input');search.id='code-search';search.placeholder='搜索题目、输入输出或概念';search.value=taskQuery;const searchUpdate=e=>{if(e.isComposing)return;taskQuery=search.value;rerenderWithFocus('code-search');};search.oninput=searchUpdate;search.oncompositionend=searchUpdate;
- root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'评测方向',v=>taskTrack=v),filter(['全部','基础','进阶','研究级'],taskLevel,'评测难度',v=>taskLevel=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
+ root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'评测方向',v=>taskTrack=v),filter(['全部',...TASK_PROGRESSIONS.map(x=>x.title)],taskPath,'递进训练路径',v=>taskPath=v),filter(['全部','基础','进阶','研究级'],taskLevel,'原始难度标签',v=>taskLevel=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
  const langKey={'Python':'python','C++17':'cpp','ROS 2 Python':'ros2_python'};
- const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept).toLowerCase().includes(taskQuery.toLowerCase()));
+ const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskPath==='全部'||TASK_META[p.id]?.pathTitle===taskPath)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept+' '+(TASK_META[p.id]?.application||'')).toLowerCase().includes(taskQuery.toLowerCase())).sort((a,b)=>{if(taskPath==='全部')return 0;return (TASK_META[a.id]?.stage||99)-(TASK_META[b.id]?.stage||99);});
  if(!ps.some(p=>p.id===selectedTask))selectedTask=ps[0]?.id;
  const list=box('card task-list'),detail=box('card task-detail');
- for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;const readiness=taskReadiness(p.id,data.progress);b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+p.level+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
+ for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;const readiness=taskReadiness(p.id,data.progress);const meta=TASK_META[p.id];b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+(meta?'第 '+meta.stage+'/'+meta.stages+' 关':p.level)+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
  const p=PROBLEMS.find(p=>p.id===selectedTask);if(!p){detail.append(el('p','没有匹配的评测题。这个方向也可能有课程实践任务。'),btn('转到课程实践',()=>{taskMode='project';render();}));root.append(box('task-grid',list,detail));return;}
  if(!p.langs.includes(language))language=p.langs[0];if(taskLang!=='全部'&&p.langs.includes(langKey[taskLang]))language=langKey[taskLang];
- detail.append(el('span',p.track+' · '+p.level,'pill blue'),el('h2',p.title),richText(p.desc),el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','为什么这样做'),richText(p.concept));
+ const meta=TASK_META[p.id],path=meta&&TASK_PROGRESSIONS.find(x=>x.id===meta.pathId);detail.append(el('span',p.track+' · '+(meta?'第 '+meta.stage+'/'+meta.stages+' 关':p.level),'pill blue'),el('h2',p.title),richText(p.desc));if(meta&&path){const stage=box('assessment-readiness');stage.append(el('h3','递进路径：'+path.title),el('p','第 '+meta.stage+' 关，共 '+meta.stages+' 关。'+path.audience+'。','muted'),el('p','实际应用：'+meta.application,'muted'));const nav=box('actions');if(meta.stage>1){const prev=path.tasks[meta.stage-2],prevTask=PROBLEMS.find(x=>x.id===prev);nav.append(btn('上一关：'+(prevTask?.title||prev),()=>{selectedTask=prev;render();}));}if(meta.stage<meta.stages){const next=path.tasks[meta.stage],nextTask=PROBLEMS.find(x=>x.id===next);nav.append(btn('下一关：'+(nextTask?.title||next),()=>{selectedTask=next;render();},'primary'));}stage.append(nav);detail.append(stage);}detail.append(el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','为什么这样做'),richText(p.concept));
  const readiness=taskReadiness(p.id,data.progress),pathPanel=box('assessment-readiness');
  pathPanel.append(el('h3','开始自动评测前：你的课程准备度'));
  pathPanel.append(el('p',readiness.why+'。建议达到：关联课程的例题核对正确，并完成带提示练习、提交实际输出与解释。','muted'));
