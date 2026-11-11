@@ -109,7 +109,8 @@ export function suiteHot(id){const b=baseCases(id);if(!b.length)throw new Error(
 function randomHot(id){
  const ints=(n,lo=-5,hi=10)=>Array.from({length:n},()=>ri(lo,hi));
  switch(id){
- case 'three_sum':case 'product_except_self':case 'move_zeroes':case 'kth_largest':case 'longest_increasing_subsequence':return {nums:ints(ri(0,12)) ,...(id==='kth_largest'?{k:ri(1,Math.max(1,12))}:{})};
+ case 'three_sum':case 'product_except_self':case 'move_zeroes':case 'longest_increasing_subsequence':return {nums:ints(ri(0,12))};
+ case 'kth_largest':{const nums=ints(ri(1,12));return {nums,k:ri(1,nums.length)};}
  case 'longest_substring':case 'longest_palindrome':return {text:Array.from({length:ri(0,15)},()=> 'abcde'[ri(0,4)]).join('')};
  case 'container_water':return {height:ints(ri(0,12),0,12)};
  case 'rotate_array':return {nums:ints(ri(0,12)),k:ri(0,20)};
@@ -122,9 +123,11 @@ function randomHot(id){
  case 'merge_two_lists':return {a:ints(ri(0,8)).sort((a,b)=>a-b),b:ints(ri(0,8)).sort((a,b)=>a-b)};
  case 'linked_list_cycle':{const n=ri(0,10);return {values:ints(n),pos:n?ri(-1,n-1):-1};}
  case 'remove_nth_from_end':{const n=ri(1,10),values=ints(n);return {values,n:ri(1,n)};}
- case 'max_depth_tree':case 'invert_tree':case 'level_order_tree':case 'validate_bst':case 'kth_smallest_bst':case 'tree_diameter':case 'lowest_common_ancestor':{const level=[ri(0,20),ri(0,20),ri(0,20),ri(0,20),ri(0,20)];return {level,...(id==='kth_smallest_bst'?{k:ri(1,5)}:{}),...(id==='lowest_common_ancestor'?{p:level[1],q:level[2]}:{})};}
- case 'number_of_islands':return {grid:Array.from({length:ri(1,5)},()=>Array.from({length:ri(1,5)},()=>ri(0,1)).join(''))};
- case 'rotting_oranges':return {grid:Array.from({length:ri(1,4)},()=>Array.from({length:ri(1,4)},()=>ri(0,2)))};
+ case 'max_depth_tree':case 'invert_tree':case 'level_order_tree':case 'validate_bst':case 'tree_diameter':{const level=[ri(0,20),ri(0,20),ri(0,20),ri(0,20),ri(0,20)];return {level};}
+ case 'kth_smallest_bst':{const level=[5,3,7,2,4];return {level,k:ri(1,5)};}
+ case 'lowest_common_ancestor':{const level=[5,3,8,2,4,7,9];return {level,p:3,q:9};}
+ case 'number_of_islands':{const h=ri(1,5),w=ri(1,5);return {grid:Array.from({length:h},()=>Array.from({length:w},()=>ri(0,1)).join(''))};}
+ case 'rotting_oranges':{const h=ri(1,4),w=ri(1,4);return {grid:Array.from({length:h},()=>Array.from({length:w},()=>ri(0,2)))};}
  case 'course_schedule':{const n=ri(1,7),pairs=[];for(let i=0;i<ri(0,10);i++)pairs.push([ri(0,n-1),ri(0,n-1)]);return {numCourses:n,prerequisites:pairs};}
  case 'subsets':case 'permutations':return {nums:ints(ri(0,6),0,8)};
  case 'combination_sum':{const candidates=[...new Set(ints(ri(1,5),1,8))].sort((a,b)=>a-b);return {candidates,target:ri(1,18)};}
@@ -139,5 +142,5 @@ function randomHot(id){
  }
 }
 export function matchesHot(id,d,a,e){
- const eq=(x,y)=>{if(typeof x==='number'&&typeof y==='number')return Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<=1e-7+1e-7*Math.abs(y);if(Array.isArray(x)||Array.isArray(y)){if(!Array.isArray(x)||!Array.isArray(y)||x.length!==y.length)return false;if(['three_sum','group_anagrams','subsets','permutations','combination_sum'].includes(id)){const key=v=>JSON.stringify(v);return [...x].map(key).sort().join('|')===[...y].map(key).sort().join('|');}return x.every((v,i)=>eq(v,y[i]));}if(x&&y&&typeof x==='object'&&typeof y==='object')return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>k in y&&eq(x[k],y[k]));return x===y;};return eq(a,e);
+ const eq=(x,y)=>{if(typeof x==='number'&&typeof y==='number')return Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<=1e-7+1e-7*Math.abs(y);if(Array.isArray(x)||Array.isArray(y)){if(!Array.isArray(x)||!Array.isArray(y)||x.length!==y.length)return false;if(id==='longest_palindrome')return typeof a==='string'&&Array.from(a).length===Array.from(e).length&&Array.from(a).join('')===Array.from(a).reverse().join('')&&Array.from(a).length>=Array.from(e).length; if(['three_sum','group_anagrams','subsets','permutations','combination_sum'].includes(id)){const key=v=>JSON.stringify(v);return [...x].map(key).sort().join('|')===[...y].map(key).sort().join('|');}return x.every((v,i)=>eq(v,y[i]));}if(x&&y&&typeof x==='object'&&typeof y==='object')return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>k in y&&eq(x[k],y[k]));return x===y;};return eq(a,e);
 }
