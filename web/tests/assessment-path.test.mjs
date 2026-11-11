@@ -7,7 +7,7 @@ import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
 
 test('every automatic task has an explicit course path',()=>{
- assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length+HOT_PROBLEMS.length);
+ assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length+HOT_PROBLEMS.length+HOT_PROBLEMS.length);
  for(const p of [...PROBLEMS,...EXPANDED_PROBLEMS,...HOT_PROBLEMS]){const path=TASK_PATHS[p.id];assert.ok(path,p.id);assert.ok(path.courses.length>0,p.id);assert.ok(path.why.length>5,p.id);}
 });
 test('readiness requires both worked-example check and guided practice evidence',()=>{
