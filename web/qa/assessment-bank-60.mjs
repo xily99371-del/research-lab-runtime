@@ -10,6 +10,7 @@ try{
  const response=await page.goto(base,{waitUntil:'networkidle'});assert.equal(response.status(),200);
  await page.waitForSelector('.learn-hero');
  await page.locator('nav button[data-page="code"]').click();
+ const pathFilter=page.locator('select[aria-label="递进训练路径"]');assert.ok(await pathFilter.count()===1);await pathFilter.selectOption({label:'图搜索与路径规划'});assert.ok(await page.locator('.task-list .task-item').count()===6);await page.locator('.task-item[data-task="bfs"]').click();assert.ok(await page.getByText(/第 1\/6 关/).count()>0);assert.ok(await page.getByText(/实际应用：/).count()>0);await page.getByRole('button',{name:/下一关：/}).click();assert.ok(await page.locator('.task-item.active[data-task="connected_components"]').count()===1);await pathFilter.selectOption({label:'全部'});
  const items=page.locator('.task-list .task-item');
  assert.equal(await items.count(),60);
  const categories=new Set();
