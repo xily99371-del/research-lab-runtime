@@ -93,7 +93,7 @@ function randomInputAdvanced(id){
  case 'softmax':return {logits:vec(ri(1,8),-20,20)};
  case 'linear_regression_step':return {x:ri(-5,5),y:ri(-5,5),w:ri(-3,3),b:ri(-3,3),lr:.01};
  case 'binary_cross_entropy':{const n=ri(1,8),y=Array.from({length:n},()=>ri(0,1)),p=Array.from({length:n},()=>ri(1,99)/100);return {y,p};}
- case 'confusion_matrix':{const n=ri(1,15),labels:[0,1,2],y_true=Array.from({length:n},()=>ri(0,2)),y_pred=Array.from({length:n},()=>ri(0,2));return {y_true,y_pred,labels};}
+ case 'confusion_matrix':{const n=ri(1,15),labels=[0,1,2],y_true=Array.from({length:n},()=>ri(0,2)),y_pred=Array.from({length:n},()=>ri(0,2));return {y_true,y_pred,labels};}
  case 'batch_norm_inference':{const c=ri(1,4),n=ri(1,5);return {x:Array.from({length:n},()=>vec(c)),gamma:vec(c),beta:vec(c),mean:vec(c),var:vec(c,0,4).map(x=>Math.abs(x)),eps:1e-5};}
  case 'conv2d_valid':{const h=ri(3,6),w=ri(3,6),kh=ri(1,Math.min(3,h)),kw=ri(1,Math.min(3,w));return {image:Array.from({length:h},()=>vec(w)),kernel:Array.from({length:kh},()=>vec(kw)),stride:ri(1,2)};}
  case 'kmeans_assign':{const n=ri(2,10),k=ri(1,Math.min(4,n));return {points:pts(n,2),centers:pts(k,2)};}
