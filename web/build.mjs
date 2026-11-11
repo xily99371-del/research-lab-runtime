@@ -7,6 +7,7 @@ import {PROBLEMS} from './src/problems.js';
 import {EXPANDED_PROBLEMS} from './src/expanded-problems.js';
 import {ALGORITHMS,ROS} from './lib/tasks.js';
 import {TASK_PATHS} from './src/guided/assessment-path.js';
+import {TASK_PROGRESSIONS,TASK_META} from './src/task-progressions.js';
 
 const source=await fs.readFile('src/index.html');
 const html=new TextDecoder('utf-8',{fatal:true}).decode(source);
@@ -29,6 +30,10 @@ assert.equal(new Set(taskIds).size,60,'Duplicate task IDs');
 assert.equal(ALGORITHMS.length,56,'All algorithm tasks must be registered server-side');
 assert.equal(ROS.length,4,'ROS 2 tasks must remain registered');
 for(const id of taskIds)assert.ok(TASK_PATHS[id],'Missing course readiness map for '+id);
+const progressionIds=TASK_PROGRESSIONS.flatMap(p=>p.tasks);
+assert.equal(progressionIds.length,taskIds.length,'Every task must be in a progression');
+assert.equal(new Set(progressionIds).size,taskIds.length,'Each task must appear exactly once in progression');
+for(const id of taskIds)assert.ok(TASK_META[id],'Missing progression metadata for '+id);
 for(const id of [...ALGORITHMS,...ROS])assert.ok(taskIds.includes(id),'Missing user-facing task metadata for '+id);
 const courses=enrichCourses(original);
 assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must not be identical generic text');
@@ -39,6 +44,6 @@ await fs.writeFile('public/courses.json',JSON.stringify(courses),'utf8');
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
 let commitSha=process.env.VERCEL_GIT_COMMIT_SHA||null;
 if(!commitSha)try{commitSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
-const release={version:'4.0.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 60 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
+const release={version:'4.1.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,progressivePaths:TASK_PROGRESSIONS.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 60 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
 await fs.writeFile('public/release.json',JSON.stringify(release),'utf8');
-console.log('Built Research Lab 4.0: 60 automatic tasks across algorithms, ML, CV, 3D, multimodal and robotics; legacy records retained.');
+console.log('Built Research Lab 4.1: 60 tasks organized into 10 progressive, application-oriented learning paths; legacy records retained.');
