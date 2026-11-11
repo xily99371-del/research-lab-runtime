@@ -34,6 +34,7 @@ export const TASK_APPLICATIONS={
   "edit_distance": "衡量语音转写、OCR或文本输入之间的编辑差异",
   "interval_scheduling": "为共享设备、机器人或实验资源安排互不冲突的任务",
   "matrix_multiply": "实现神经网络线性层、坐标变换和批量特征计算",
+  "attention": "计算Transformer中Query与Key的相关性，再对Value做加权聚合",
   "linear_regression_step": "手写一个回归训练步骤，理解参数如何由误差更新",
   "softmax": "把分类器输出的logits转换为稳定的类别概率",
   "binary_cross_entropy": "计算二分类模型的训练目标并处理极端概率",
