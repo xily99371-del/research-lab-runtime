@@ -1,4 +1,4 @@
-# Research Lab 4.0
+# Research Lab 4.1
 
 Research Lab is a research-learning workspace combining structured teaching, mathematical derivations, selectable practice tasks, code evaluation, ROS 2 integration checks, and versioned Supabase learning records.
 
@@ -40,3 +40,10 @@ Vercel project: research-lab-learning; root directory: web; Node 22; build comma
 - Every task has a server-side reference, public examples, randomized hidden cases, numeric comparison tolerances where appropriate, a course mapping and a readiness checklist.
 - The four ROS 2 tasks remain actual ROS 2 Python node contracts. New robotics geometry helpers are Python/C++ algorithm tasks; they are not mislabeled as additional ROS graph/simulator tasks.
 - The online runner still uses the isolated per-submission sandbox. Open-ended model training, GPU benchmarks and full Nav2 simulation are not claimed as supported by this phase.
+
+
+## 递进式题库 4.1
+- 60道自动评测任务组织为10条训练路径，每条路径按先修关系与实际应用场景递进。
+- 训练路径覆盖数组/哈希/滑动窗口、栈/二分/字符串、图搜索、动态规划/贪心、机器学习计算、视觉几何、点云三维、大模型基础、机器人状态与导航、科研评价。
+- 题目页显示路径关卡、总关数、应用场景，并可直接跳转上一关/下一关；可以按路径筛选，仍支持方向、难度、语言与关键词过滤。
+- 难度不以题面长度衡量：从单一原语、边界处理，递进到多个算法组合和工程约束。研究级题目保留，但不强行混入面试基础路径。
