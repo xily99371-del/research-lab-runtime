@@ -27,7 +27,7 @@ test('prerequisite graph is acyclic and routes only reference valid course IDs',
 });
 test('linked online tasks exist; open-ended units are not silently assigned unrelated graders',()=>{
  for(const [id,ids]of Object.entries(EXACT_LINKS)){assert.ok(GUIDES[id]);for(const task of ids)assert.ok([...PROBLEMS,...EXPANDED_PROBLEMS].some(p=>p.id===task));}
- assert.equal(EXACT_LINKS.u53,undefined);assert.equal(EXACT_LINKS.u74,undefined);
+ assert.equal(EXACT_LINKS.u53,undefined);assert.deepEqual(EXACT_LINKS.u74,['ekf_scalar_update']);
  assert.equal(EXACT_LINKS.u49[0],'attention');assert.equal(EXACT_LINKS.u72[0],'ros_tf');
 });
 test('classroom checks reject empty/wrong answers and accept numerical tolerances',()=>{
