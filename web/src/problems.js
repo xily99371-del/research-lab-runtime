@@ -1,0 +1,15 @@
+const py='def solve(data):\n    # 返回 JSON 可序列化结果，不需要读取 stdin 或编写 main。\n    raise NotImplementedError("请独立实现")\n';
+const cpp='json solve(const json& data) {\n    // 已提供 nlohmann::json、标准库和 main。返回 json 结果。\n    throw std::runtime_error("请独立实现");\n}\n';
+const ros='from rclpy.node import Node\n\ndef build_node():\n    # 评测器负责 rclpy.init()、spin 和 shutdown。\n    # 返回一个配置好通信接口的 Node；把 publisher/subscriber 存到对象上。\n    node = Node("my_solution")\n    return node\n';
+export const PROBLEMS=[
+{id:'two_sum',title:'两数之和 · 哈希查找',langs:['python','cpp'],desc:'data = {nums: 整数数组, target: 整数}。返回两个不同下标 [i,j]，满足 nums[i]+nums[j]=target；无解返回 []。允许任意有效下标顺序。数组含重复值、负数、空数组。目标：期望 O(n) 时间与 O(n) 额外空间。',example:'{"nums":[2,7,11,15],"target":9} → [0,1]',unit:'u2'},
+{id:'parentheses',title:'括号匹配 · 栈与不变式',langs:['python','cpp'],desc:'data={text:字符串}，仅包含 ()[]{}。返回布尔值，空串有效。解释“栈中恰是尚未匹配的左括号”的循环不变式，不只记住模板。',example:'{"text":"([)]"} → false',unit:'u2'},
+{id:'bfs',title:'图搜索 · BFS 确定性遍历',langs:['python','cpp'],desc:'data={n,edges,start}；无向图顶点 0..n-1，edges 为 [u,v] 数组。按邻居顶点从小到大的顺序 BFS，返回可达顶点访问序列，n=0 返回 []。处理重复边、自环、不连通分量。目标：邻接表 O(V+E)，邻居排序开销需另行说明。',example:'{"n":5,"edges":[[0,1],[0,2],[1,3],[2,4]],"start":0} → [0,1,2,3,4]',unit:'u3'},
+{id:'attention',title:'Scaled Dot-Product Attention · 数值验证',langs:['python','cpp'],desc:'data={q,k,v,mask?}；q:[Tq,D]，k:[Tk,D]，v:[Tk,Dv]；mask:[Tq,Tk] 布尔矩阵，true 表示允许关注。输出 [Tq,Dv]。实现 softmax(QKᵀ/√D)V，先减行最大值防溢出。完全遮挡行约定输出零向量。判定绝对/相对容差 1e-5。允许 numpy，不允许调用现成 attention 封装；后者需代码审查，自动测试只查行为。',example:'{"q":[[1,0]],"k":[[1,0],[0,1]],"v":[[2],[4]]} → [[2.6604769]]',unit:'u32'},
+{id:'astar',title:'栅格 A* · 最优路径长度',langs:['python','cpp'],desc:'data={grid,start,goal}；0 可走、1 障碍，start/goal 为 [row,col]。仅四邻域、每步代价 1。返回最短步数，不可达或起终点被占据返回 -1。起点=终点且可走返回 0。评测验证距离最优；是否使用 A* 及启发式一致性的证明另行审核。',example:'{"grid":[[0,0,0],[1,1,0],[0,0,0]],"start":[0,0],"goal":[2,2]} → 4',unit:'u3'},
+{id:'ros_topic',title:'ROS 2 · Topic 消息闭环',langs:['ros2_python'],desc:'实现 build_node()。订阅 /training/input（std_msgs/msg/String），把消息字符串转为大写后发布至 /training/output（同类型）。QoS：RELIABLE、VOLATILE、depth=10。测试会启动独立验证节点，发送不同消息，核验发现和真实输出，不接受只打印日志。',example:'输入消息 "robot abc" → 输出消息 "ROBOT ABC"',unit:'u45'},
+{id:'ros_service',title:'ROS 2 · Service 请求响应',langs:['ros2_python'],desc:'实现 build_node()，提供 /training/add 服务，类型 example_interfaces/srv/AddTwoInts。返回 sum=a+b。测试发现服务并发出正数、负数、零和随机数请求。保持事件循环可响应；不在回调中递归 spin。',example:'请求 a=-13,b=5 → 响应 sum=-8',unit:'u45'},
+{id:'ros_tf',title:'ROS 2 · TF2 刚体变换',langs:['ros2_python'],desc:'实现 build_node()，持续提供 world→sensor 静态变换：平移 (1,2,0)，绕 z 轴旋转 +π/2。使用正确四元数和 frame_id/child_frame_id。验证器通过 TF2 查询变换、检查四元数范数，并验证 sensor 中点 (1,0,0) 变换到 world 为 (1,3,0)。',example:'q=(0,0,sin(π/4),cos(π/4))；q 与 -q 等价。',unit:'u46'},
+{id:'ros_action',title:'ROS 2 · Action Goal/Result',langs:['ros2_python'],desc:'实现 build_node()，创建 /training/fibonacci ActionServer，类型 example_interfaces/action/Fibonacci。本题 order 定义为项数 n，返回前 n 项 [0,1,1,2,...]；接受目标并以 SUCCEEDED 结束。当前测试 goal/result；反馈与取消语义不计入本题已验证能力。',example:'order=6 → sequence=[0,1,1,2,3,5]',unit:'u45'}
+];
+export function starter(lang){return lang==='cpp'?cpp:lang==='ros2_python'?ros:py;}

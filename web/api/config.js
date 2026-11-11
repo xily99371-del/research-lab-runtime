@@ -1,0 +1,1 @@
+export default function handler(req,res){res.setHeader('Cache-Control','no-store');res.status(200).json({version:'3.2.0',supabaseUrl:process.env.SUPABASE_URL||null,supabaseKey:process.env.SUPABASE_ANON_KEY||null,runnerConfigured:!!(process.env.SANDBOX_SNAPSHOT_ID&&process.env.GRADER_SIGNING_KEY)});}
