@@ -11,6 +11,7 @@ import {REMAINING_LESSONS} from '../src/remaining-lessons.js';
 import {ROS_MIDDLEWARE_LESSON} from '../src/ros-middleware-lesson.js';
 import {LEGACY_LESSON_FORMULAS} from '../src/lesson-formulas.js';
 import {PROBLEMS} from '../src/problems.js';
+import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
 
@@ -25,7 +26,7 @@ test('prerequisite graph is acyclic and routes only reference valid course IDs',
  for(const r of ROUTES)for(const id of r.units)assert.ok(GUIDES[id]);
 });
 test('linked online tasks exist; open-ended units are not silently assigned unrelated graders',()=>{
- for(const [id,ids]of Object.entries(EXACT_LINKS)){assert.ok(GUIDES[id]);for(const task of ids)assert.ok(PROBLEMS.some(p=>p.id===task));}
+ for(const [id,ids]of Object.entries(EXACT_LINKS)){assert.ok(GUIDES[id]);for(const task of ids)assert.ok([...PROBLEMS,...EXPANDED_PROBLEMS].some(p=>p.id===task));}
  assert.equal(EXACT_LINKS.u53,undefined);assert.equal(EXACT_LINKS.u74,undefined);
  assert.equal(EXACT_LINKS.u49[0],'attention');assert.equal(EXACT_LINKS.u72[0],'ros_tf');
 });
