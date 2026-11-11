@@ -1,9 +1,18 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {normalize,emptyState,merge3} from '../src/state.js';import {reference,matches,suite,ALGORITHMS} from '../lib/tasks.js';import {PROBLEMS} from '../src/problems.js';import {LESSONS} from '../src/lessons.js';import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
-test('account data normalization',()=>{assert.deepEqual(normalize(null),emptyState());assert.deepEqual(normalize({papers:'bad'}).papers,[]);});
-test('disjoint device edits merge',()=>{let b=emptyState(),l=structuredClone(b),r=structuredClone(b);l.progress.u1={note:'A'};r.progress.u2={note:'B'};let x=merge3(b,l,r);assert.equal(x.conflicts.length,0);assert.equal(x.value.progress.u1.note,'A');assert.equal(x.value.progress.u2.note,'B');});
-test('same note conflict retained rather than overwritten',()=>{const b={note:'old'},l={note:'mine'},r={note:'other'};assert.equal(merge3(b,l,r).conflicts.length,1);});
-test('every algorithm suite validates reference',()=>{for(const id of ALGORITHMS){const s=suite(id);assert.ok(s.length>10);for(const t of s)assert.equal(matches(id,t.input,reference(id,t.input),t.expected),true);}});
-test('two-sum reversed valid indices accepted',()=>assert.equal(matches('two_sum',{nums:[2,7],target:9},[1,0],[0,1]),true));
-test('masked attention returns zero, no NaN',()=>assert.deepEqual(reference('attention',{q:[[999]],k:[[999]],v:[[4]],mask:[[false]]}),[[0]]));
-
-test('expanded selectable task bank covers algorithm and ROS¶»§q«^
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {normalize,emptyState,merge3} from '../src/state.js';
+import {reference,matches,suite,ALGORITHMS,ROS} from '../lib/tasks.js';
+import {PROBLEMS} from '../src/problems.js';
+import {LESSONS} from '../src/lessons.js';
+import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
+import fs from 'node:fs';
+const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
+test('workspace normalization and safe keys',()=>{assert.deepEqual(normalize(null),emptyState());assert.deepEqual(normalize({papers:'bad'}).papers,[]);assert.equal(normalize({progress:{'__proto__':{x:1}}}).progress.x,undefined);});
+test('disjoint device edits merge',()=>{const b=emptyState(),l=structuredClone(b),r=structuredClone(b);l.progress.u1={note:'A'};r.progress.u2={note:'B'};const x=merge3(b,l,r);assert.equal(x.conflicts.length,0);assert.equal(x.value.progress.u1.note,'A');assert.equal(x.value.progress.u2.note,'B');});
+test('same field conflict is surfaced',()=>{const b={note:'old'},l={note:'mine'},r={note:'other'};assert.equal(merge3(b,l,r).conflicts.length,1);});
+test('all 96 course IDs are unique and stable',()=>{assert.equal(courses.length,96);assert.equal(new Set(courses.map(x=>x.id)).size,96);assert.equal(courses[0].id,'u1');assert.equal(courses[95].id,'u96');});
+test('task bank covers all algorithm IDs',()=>{assert.equal(PROBLEMS.length,26);assert.deepEqual(new Set(PROBLEMS.filter(x=>x.langs.includes('ros2_python')).map(x=>x.id)),new Set(ROS));for(const id of ALGORITHMS){assert.ok(PROBLEMS.some(p=>p.id===id));}});
+test('every algorithm suite validates its reference',()=>{for(const id of ALGORITHMS){const s=suite(id);assert.ok(s.length>=10,id);for(const t of s)assert.equal(matches(id,t.input,reference(id,t.input),t.expected),true,id);}});
+test('two-sum accepts reversed valid indices',()=>assert.equal(matches('two_sum',{nums:[2,7],target:9},[1,0],[0,1]),true));
+test('attention mask produces finite zero row',()=>assert.deepEqual(reference('attention',{q:[[999]],k:[[999]],v:[[4]],mask:[[false]]}),[[0]]));
+test('math lessons exist and expose sections',()=>{const all={...LESSONS,...ADVANCED_LESSONS};assert.ok(Object.keys(all).length>=20);for(const [id,l] of Object.entries(all)){assert.ok(l.sections.length>=3,id);assert.ok(l.questions.length>=2,id);}});
