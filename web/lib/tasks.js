@@ -1,10 +1,11 @@
 import {randomInt} from 'node:crypto';
+import {EXPANDED_IDS,referenceAdvanced,expandedSuite,randomInputAdvanced,matchesAdvanced} from './expanded-tasks.js';
 
 export const ALGORITHMS=[
 'two_sum','parentheses','bfs','attention','astar','binary_search','dijkstra',
 'knapsack','merge_intervals','top_k','max_subarray','union_find','lcs',
 'topological_sort','coin_change','lis','sliding_window_max','kmp',
-'matrix_multiply','interval_scheduling','connected_components','edit_distance'
+'matrix_multiply','interval_scheduling','connected_components','edit_distance',...EXPANDED_IDS
 ];
 export const ROS=['ros_topic','ros_service','ros_tf','ros_action'];
 const ri=(a,b)=>randomInt(a,b+1);
@@ -12,6 +13,7 @@ const sortNum=a=>[...a].sort((x,y)=>x-y);
 const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 
 export function reference(id,d){
+ if(EXPANDED_IDS.includes(id))return referenceAdvanced(id,d);
  if(id==='two_sum'){const seen=new Map();for(let i=0;i<d.nums.length;i++){const j=seen.get(d.target-d.nums[i]);if(j!==undefined)return[j,i];seen.set(d.nums[i],i);}return[];}
  if(id==='parentheses'){const st=[],m={')':'(',']':'[','}':'{'};for(const c of d.text){if('([{'.includes(c))st.push(c);else if(st.pop()!==m[c])return false;}return st.length===0;}
  if(id==='bfs'){if(!d.n)return[];const g=Array.from({length:d.n},()=>new Set());for(const [a,b]of d.edges){g[a].add(b);g[b].add(a);}const q=[d.start],v=new Set(q);for(let i=0;i<q.length;i++)for(const x of [...g[q[i]]].sort((a,b)=>a-b))if(!v.has(x)){v.add(x);q.push(x);}return q;}
@@ -85,10 +87,12 @@ function randomInput(id){
  if(id==='interval_scheduling'){const intervals=Array.from({length:ri(0,25)},()=>{const a=ri(0,30),b=ri(a,40);return [a,b];});return {intervals};}
  if(id==='connected_components'){const n=ri(0,30),edges=[];for(let i=0;i<ri(0,Math.max(1,n*2));i++)if(n)edges.push([ri(0,n-1),ri(0,n-1)]);return {n,edges};}
  if(id==='edit_distance')return {a:str(ri(0,30)),b:str(ri(0,30))};
+ if(EXPANDED_IDS.includes(id))return randomInputAdvanced(id);
  throw new Error('No random generator for '+id);
 }
-export function suite(id){const base=cases[id];if(!base)throw new Error('No test suite');const out=base.map((input,i)=>({input,public:i<2,expected:reference(id,input)}));for(let i=0;i<12;i++){const input=randomInput(id);out.push({input,public:false,expected:reference(id,input)});}return out;}
+export function suite(id){if(EXPANDED_IDS.includes(id))return expandedSuite(id);const base=cases[id];if(!base)throw new Error('No test suite');const out=base.map((input,i)=>({input,public:i<2,expected:reference(id,input)}));for(let i=0;i<12;i++){const input=randomInput(id);out.push({input,public:false,expected:reference(id,input)});}return out;}
 export function matches(id,d,a,e){
+ if(EXPANDED_IDS.includes(id))return matchesAdvanced(id,d,a,e);
  if(id==='two_sum')return Array.isArray(a)&&((e.length===0&&a.length===0)||(a.length===2&&a.every(x=>Number.isInteger(x)&&x>=0&&x<d.nums.length)&&a[0]!==a[1]&&d.nums[a[0]]+d.nums[a[1]]===d.target));
  if(id==='attention')return Array.isArray(a)&&a.length===e.length&&a.every((r,i)=>Array.isArray(r)&&r.length===e[i].length&&r.every((x,j)=>typeof x==='number'&&Number.isFinite(x)&&Math.abs(x-e[i][j])<=1e-5+Math.abs(e[i][j])*1e-5));
  return eq(a,e);
