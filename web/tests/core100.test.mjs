@@ -26,9 +26,10 @@ test('the full assessment catalogue contains 100 unique tasks in three practical
 test('every core task has a five-tier path, practical application and prerequisite course link',()=>{
  const all=[...PROBLEMS,...EXPANDED_PROBLEMS,...CORE100_PROBLEMS];
  const linked=new Set(enrichCourses(courses).flatMap(c=>c.taskIds||[]));
- for(const p of all){assert.ok(TASK_META[p.id],p.id);assert.ok(TASK_PATHS[p.id]?.courses.length,p.id);assert.ok(linked.has(p.id),p.id);assert.ok(TIER_INFO[TASK_META[p.id].tier],p.id);assert.ok(TASK_META[p.id].application.length>12,p.id);assert.notEqual(TASK_META[p.id].application,'训练问题建模、边界处理与复杂度分析。',p.id);}
+ const ranked=applyTaskMeta(all);
+ for(const p of ranked){assert.ok(TASK_META[p.id],p.id);assert.ok(TASK_PATHS[p.id]?.courses.length,p.id);assert.ok(linked.has(p.id),p.id);assert.ok(TIER_INFO[TASK_META[p.id].tier],p.id);assert.ok(p.application.length>12,p.id);assert.notEqual(p.application,'训练问题建模、边界处理与复杂度分析。',p.id);}
  for(const p of CORE100_PROBLEMS){assert.deepEqual(p.langs,['python','cpp'],p.id);assert.ok(p.application.length>8,p.id);assert.ok(p.pattern.length>1,p.id);}
- const ranked=applyTaskMeta(all);assert.equal(ranked.length,100);assert.deepEqual(new Set(ranked.map(p=>p.id)),new Set(all.map(p=>p.id)));assert.deepEqual([1,2,3,4,5].map(t=>ranked.filter(p=>p.path==='核心算法'&&p.tier===t).length),[9,18,18,12,3]);
+ assert.equal(ranked.length,100);assert.deepEqual(new Set(ranked.map(p=>p.id)),new Set(all.map(p=>p.id)));assert.deepEqual([1,2,3,4,5].map(t=>ranked.filter(p=>p.path==='核心算法'&&p.tier===t).length),[9,18,18,12,3]);
 });
 
 test('all 40 new high-frequency algorithm tasks have working randomized test suites',()=>{
