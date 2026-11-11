@@ -19,7 +19,8 @@ jobs:
           cd web
           npm install --package-lock-only --ignore-scripts
           npm ci
-          npm test
+          npm audit --audit-level=high
+          npm run build
           node --check src/app.js
           node --check api/evaluate.js
       - uses: actions/setup-python@v5

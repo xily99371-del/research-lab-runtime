@@ -14,6 +14,11 @@
     "@supabase/supabase-js": "2.119.0",
     "@vercel/sandbox": "3.9.1",
     "esbuild": "0.28.2",
-    "katex": "0.16.22"
+    "katex": "0.18.2"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "4.6.7"
+    }
   }
 }
