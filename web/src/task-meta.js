@@ -36,10 +36,75 @@ add('ROS 2系统集成',1,['ros_topic'],{ros_topic:'Topic发布订阅'});
 add('ROS 2系统集成',2,['ros_service'],{ros_service:'Service请求响应'});
 add('ROS 2系统集成',3,['ros_tf'],{ros_tf:'TF2坐标变换'});
 add('ROS 2系统集成',4,['ros_action'],{ros_action:'Action长任务通信'});
+
+const APPLICATIONS={
+ two_sum:'在日志、交易或传感器事件中快速查找满足目标条件的两条记录',
+ parentheses:'校验配置文件、表达式和结构化消息中的括号嵌套',
+ bfs:'在无权地图或状态网络中寻找最少步数的可达路径',
+ astar:'在机器人栅格地图中结合启发式代价规划低代价路径',
+ binary_search:'在已排序索引、阈值表和时间序列中快速定位边界',
+ dijkstra:'在非负边权路网、通信网络或代价图中计算最短路径',
+ knapsack:'在算力、内存或载荷受限时选择收益最大的任务组合',
+ merge_intervals:'合并重叠的时间窗、预约区间或传感器事件区间',
+ top_k:'从日志、告警或检索结果中找出最常见的K类项目',
+ max_subarray:'从连续时序指标中定位累计收益或异常最明显的区段',
+ union_find:'维护地图区域、网络设备或动态连接关系的连通性',
+ lcs:'比较两段操作序列、文本版本或轨迹离散序列的共同结构',
+ topological_sort:'安排软件构建、实验流程和机器人任务的依赖顺序',
+ coin_change:'用有限面额或离散资源单位组合出目标预算',
+ lis:'从带噪序列中提取最长保持递增的趋势子序列',
+ sliding_window_max:'在线监测传感器信号或吞吐指标的局部峰值',
+ kmp:'在长日志、协议流和文本数据中线性时间匹配模式串',
+ matrix_multiply:'执行神经网络线性层、特征投影和坐标变换的核心算子',
+ interval_scheduling:'在共享设备、实验仪器或机器人时段中安排最多不冲突任务',
+ connected_components:'分析占用地图、图像掩膜或通信拓扑中的连通区域',
+ edit_distance:'衡量OCR文本、命令输入或识别结果之间的编辑差异',
+ attention:'计算Transformer序列建模中的查询—键相关性与信息聚合',
+ softmax:'将分类Logits或注意力分数稳定转换为概率分布',
+ linear_regression_step:'验证模型训练中一次参数更新是否沿损失梯度下降',
+ binary_cross_entropy:'训练二分类器并评估缺陷检测、事件识别等概率输出',
+ confusion_matrix:'按类别统计分类器或目标识别系统的误检与漏检',
+ batch_norm_inference:'在视觉模型部署阶段按训练统计量归一化特征通道',
+ conv2d_valid:'实现CNN局部特征提取中的二维卷积窗口运算',
+ kmeans_assign:'将视觉特征或点云局部描述子分配到聚类中心',
+ iou_xyxy:'计算检测预测框与标注框的重叠程度以匹配目标',
+ nms:'抑制目标检测中同一物体产生的重复候选框',
+ project_point:'把相机坐标系中的三维点投影到图像像素以叠加检测结果',
+ unproject_point:'将深度相机像素恢复为相机坐标系中的三维测量点',
+ homography_apply:'将地面平面上的图像点映射到鸟瞰图或配准图像',
+ stereo_depth:'根据双目视差估计场景深度并恢复三维结构',
+ chamfer_distance:'比较预测点云与真实点云的几何重建误差',
+ voxel_downsample:'在点云配准或检测前压缩冗余点并保留局部几何分布',
+ fps:'从高密度点云中均匀抽取固定数量的几何代表点',
+ knn_points:'为点云局部特征、法向估计或邻域卷积查询最近邻',
+ rigid_transform:'估计或应用ICP、相机外参和传感器之间的刚体位姿关系',
+ plane_residual:'评估地面分割、平面拟合或结构表面检测的几何误差',
+ point_centroid:'从目标点云簇计算物体中心以辅助定位和抓取',
+ transform_points:'使用4×4齐次矩阵在相机、雷达、机器人基座等坐标系间转换点',
+ bbox3d_iou:'评估三维目标检测中预测框与标注框的空间重叠',
+ depth_to_pointcloud:'将RGB-D深度图转换为相机坐标系点云供建图和检测使用',
+ tokenize_greedy:'将文本切分为词表Token以理解模型输入长度和编码边界',
+ rotary_pair:'实现旋转位置编码中的通道对旋转以注入相对位置信息',
+ kv_cache_bytes:'估算大模型长上下文推理时Key/Value缓存的显存占用',
+ contrastive_loss:'训练图像—文本或跨模态特征的正负样本对齐',
+ quaternion_rotate:'用四元数旋转向量以处理机器人姿态和传感器方向',
+ occupancy_grid_index:'将世界坐标转换为导航代价地图的行列栅格索引',
+ ekf_scalar_update:'用新测量更新机器人状态估计中的均值与不确定性',
+ path_length:'量化机器人导航轨迹长度并比较不同规划策略',
+ recall_at_k:'评估视觉地点识别或向量检索是否把正确候选放入前K名',
+ average_precision:'评估目标检测或图像检索在不同召回率下的精度表现',
+ paired_mean_difference:'在同一批场景或查询上比较基线与新方法的配对指标变化',
+ ros_topic:'在相机、雷达、里程计和控制节点间传递实时消息',
+ ros_service:'封装一次性机器人查询、参数读取或触发式控制请求',
+ ros_tf:'维护base_link、camera、lidar等机器人坐标系之间的变换链',
+ ros_action:'执行导航、机械臂运动等长时任务并反馈进度和结果'
+};
+for(const [id,application] of Object.entries(APPLICATIONS))if(meta[id])meta[id].application=application;
+
 export const TASK_META=Object.freeze(meta);
 export function applyTaskMeta(problems){
  const ids=new Set(problems.map(p=>p.id));
  for(const p of problems)if(!TASK_META[p.id])throw Error('Missing progressive metadata: '+p.id);
  for(const id of Object.keys(TASK_META))if(!ids.has(id))throw Error('Metadata references missing task: '+id);
- return problems.map(p=>({...p,...TASK_META[p.id]})).sort((a,b)=>a.tier-b.tier||({ '核心算法':0,'AI/机器人专题':1,'ROS 2系统集成':2}[a.path]-{'核心算法':0,'AI/机器人专题':1,'ROS 2系统集成':2}[b.path])||a.sequence-b.sequence);
+ return problems.map(p=>({...p,...TASK_META[p.id],pattern:p.pattern||TASK_META[p.id].pattern,application:p.application||TASK_META[p.id].application})).sort((a,b)=>a.tier-b.tier||({ '核心算法':0,'AI/机器人专题':1,'ROS 2系统集成':2}[a.path]-{'核心算法':0,'AI/机器人专题':1,'ROS 2系统集成':2}[b.path])||a.sequence-b.sequence);
 }
