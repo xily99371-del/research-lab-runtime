@@ -1,6 +1,7 @@
 import {GUIDES,EXACT_LINKS,enrichCourses} from './catalog.js';
 import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit} from './model.js';
 import {richText} from './math.js';
+import {taskReadiness,nextReadinessStep} from './assessment-path.js';
 import './learning.css';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
@@ -38,9 +39,29 @@ function evidenceForm(ctx,id,key,labels){
  wrap.append(group('actions',button('提交本阶段证据',submit,'primary')),status);return wrap;
 }
 function linkedTasks(ctx,id){return ctx.problems.filter(p=>(EXACT_LINKS[id]||[]).includes(p.id));}
+function readinessCard(ctx,task){
+ const r=taskReadiness(task.id,ctx.data.progress),wrap=group('assessment-path-card');
+ const passed=ctx.jobs.some(j=>j.task_id===task.id&&j.status==='passed');
+ wrap.append(group('assessment-path-head',e('b',task.title),e('span',r.ready?'建议准备已完成':r.label,'assessment-state '+(r.ready?'ready':''))));
+ wrap.append(e('p','建议先具备：'+r.why+'。准备标准：每门关联课程的例题核对正确，并提交一份带提示练习的实际输出与解释。','muted'));
+ for(const item of r.items){
+  const row=group('assessment-path-row');
+  row.append(e('strong',GUIDES[item.id] ? (ctx.courses.find(c=>c.id===item.id)?.title||item.id):item.id));
+  row.append(e('span',(item.theory?'✓ 例题已核对':'○ 例题待核对')+'　'+(item.practice?'✓ 实践已提交':'○ 实践待提交'),'assessment-checks'));
+  if(!item.complete)row.append(button(item.theory?'去提交带提示练习':'去核对例题',()=>open(ctx,item.id,item.next)));
+  wrap.append(row);
+ }
+ wrap.append(group('actions',
+  button(passed?'再次运行自动评测':'开始自动评测',()=>ctx.openTask(task.id),r.ready?'primary':''),
+  !r.ready?button('我想提前挑战',()=>ctx.openTask(task.id),'secondary'):null
+ ));
+ if(!r.ready)wrap.append(callout('准备建议不是考试门槛。你可以提前提交；如果连续卡住，先补上面标出的那一步。','neutral'));
+ else wrap.append(callout('已达到建议起点。开始评测后，测试失败也可以回到对应课程补习，不需要从头重学。','ok'));
+ return wrap;
+}
 function taskLinks(ctx,id){const ps=linkedTasks(ctx,id),wrap=group('learn-links');
- if(ps.length){wrap.append(title('关联自动评测（题目行为测试）'));for(const p of ps){const passed=ctx.jobs.some(j=>j.task_id===p.id&&j.status==='passed');wrap.append(button((passed?'✓ ':'')+p.title,()=>ctx.openTask(p.id),passed?'learn-task-passed':''));}wrap.append(e('p','相关题通过只证明该题的程序行为，不自动替代本节的完整实现或研究迁移。','muted'));}
- else wrap.append(callout('本节是本地/开放实验，尚无对应在线判题。请按明确输入输出完成测试并提交证据；网页不会把自评伪装成自动评分。','neutral'));
+ if(ps.length){wrap.append(title('这节课对应的自动评测'));for(const p of ps)wrap.append(readinessCard(ctx,p));wrap.append(e('p','自动评测验证程序行为；课程实践还会检查独立实现与研究迁移，两类证据不会互相替代。','muted'));}
+ else wrap.append(callout('本节目前没有独立在线判题。请按课程接口、样例和交付要求完成开放实践；不要把自评记录当作自动评分。','neutral'));
  return wrap;
 }
 function lessonIntro(ctx,c,g,p){
@@ -134,7 +155,7 @@ export function renderLearningPractice(root,ctx){
  const sel=e('select');sel.setAttribute('aria-label','实践方向');for(const t of ['全部',...new Set(ctx.courses.map(c=>c.track))]){const o=e('option',t);sel.append(o);}sel.value=ui.practiceTrack;sel.onchange=()=>{ui.practiceTrack=sel.value;ctx.refresh();};
  const q=e('input');q.id='practice-search';q.placeholder='搜索实践内容、输入输出或主题';q.value=ui.practiceQuery;q.oninput=ev=>{if(ev.isComposing)return;ui.practiceQuery=q.value;preserveFocus(ctx);};q.oncompositionend=()=>{ui.practiceQuery=q.value;preserveFocus(ctx);};root.append(group('learn-toolbar',sel,q));
  const list=group('learn-practice-grid');for(const c of ctx.courses){const g=GUIDES[c.id];if(ui.practiceTrack!=='全部'&&ui.practiceTrack!==c.track)continue;if(!(c.title+' '+g.guided.fixture+' '+g.independent).toLowerCase().includes(ui.practiceQuery.toLowerCase()))continue;
- const card=group('record task-item learn-practice-card');card.dataset.unit=c.id;card.append(e('span',c.track,'pill'),e('h3',c.title),richText(g.guided.fixture),e('p',learnerStatus(ctx.data.progress,c.id,ctx.jobs,EXACT_LINKS[c.id]||[]).label,'muted'),e('p',linkedTasks(ctx,c.id).length?'有关联在线题目；开放实验仍单独提交证据。':'本地/开放实验：有接口、样例、分层提示与证据记录。','muted'),group('actions',button('开始分步任务',()=>open(ctx,c.id,2),'primary'),button('先看例子',()=>open(ctx,c.id,1)),button('加入本周',()=>plan(ctx,c.id,2))));list.append(card);
+ const card=group('record task-item learn-practice-card');card.dataset.unit=c.id;card.append(e('span',c.track,'pill'),e('h3',c.title),richText(g.guided.fixture),e('p',learnerStatus(ctx.data.progress,c.id,ctx.jobs,EXACT_LINKS[c.id]||[]).label,'muted'),e('p',linkedTasks(ctx,c.id).length?'有关联自动评测；完成本节例题核对和带提示练习后，系统会提示可以开始。':'本地/开放实验：有接口、样例、分层提示与证据记录。','muted'),...linkedTasks(ctx,c.id).map(task=>readinessCard(ctx,task)),group('actions',button('开始分步任务',()=>open(ctx,c.id,2),'primary'),button('先看例子',()=>open(ctx,c.id,1)),button('加入本周',()=>plan(ctx,c.id,2))));list.append(card);
  }root.append(list);
 }
 export function renderJourneyHome(root,ctx){
