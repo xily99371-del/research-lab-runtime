@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PROBLEMS} from '../src/problems.js';
+import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
+import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
 
 test('every automatic task has an explicit course path',()=>{
- assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length);
+ assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length);
  for(const p of PROBLEMS){const path=TASK_PATHS[p.id];assert.ok(path,p.id);assert.ok(path.courses.length>0,p.id);assert.ok(path.why.length>5,p.id);}
 });
 test('readiness requires both worked-example check and guided practice evidence',()=>{
@@ -28,6 +30,6 @@ test('no old self-check, viewed stage, or unrelated online pass grants readiness
  assert.equal(taskReadiness('attention',progress).checksDone,0);
 });
 test('all mapped task routes point to actual existing course IDs',()=>{
- const valid=new Set(['u1','u2','u3','u4','u9','u15','u36','u49','u70','u71','u72','u79']);
+ const valid=new Set(Object.keys(GUIDES));
  for(const [task,path]of Object.entries(TASK_PATHS))for(const id of path.courses)assert.ok(valid.has(id),task+':'+id);
 });
