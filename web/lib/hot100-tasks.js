@@ -106,7 +106,7 @@ decode_ways:[{s:'226'},{s:'06'}],
 longest_increasing_subsequence:[{nums:[10,9,2,5,3,7,101,18]}]
 };return b[id]||[];}
 export function suiteHot(id){const b=baseCases(id);if(!b.length)throw new Error('Missing Hot100 test cases '+id);return [...b.map((input,i)=>({input,public:i<2,expected:referenceHot(id,input)})),...Array.from({length:16},()=>{const input=randomHot(id);return {input,public:false,expected:referenceHot(id,input)};})];}
-function randomHot(id){
+export function randomHot(id){
  const ints=(n,lo=-5,hi=10)=>Array.from({length:n},()=>ri(lo,hi));
  switch(id){
  case 'three_sum':case 'product_except_self':case 'move_zeroes':case 'longest_increasing_subsequence':return {nums:ints(ri(0,12))};
