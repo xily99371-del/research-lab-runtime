@@ -2,7 +2,7 @@
 // to a composed, constraint-heavy task grounded in engineering work.
 export const TASK_PROGRESSIONS=[
 {id:'arrays-hash',title:'数组、哈希与滑动窗口',audience:'算法基础 / 工程高频',tasks:['two_sum','top_k','sliding_window_max','max_subarray'],why:'日志聚合、检索索引、缓存窗口与在线统计'},
-{id:'stack-search',title:'栈、二分与字符串',audience:'算法基础 / 工程高频',tasks:['parentheses','binary_search','kmp','merge_intervals'],why:'解析器、边界定位、文本匹配与时间区间合并'},
+{id:'stack-search',title:'栈、二分与字符串',audience:'算法基础 / 工程高频',tasks:['binary_search','kmp','merge_intervals'],why:'解析器、边界定位、文本匹配与时间区间合并'},
 {id:'graphs',title:'图搜索与路径规划',audience:'算法基础 / 机器人应用',tasks:['bfs','connected_components','union_find','topological_sort','dijkstra','astar'],why:'依赖调度、连通性检查、地图搜索与机器人路径规划'},
 {id:'dp-greedy',title:'动态规划与贪心',audience:'算法基础 / 优化问题',tasks:['coin_change','knapsack','lis','lcs','edit_distance','interval_scheduling'],why:'资源分配、序列分析、文本纠错与任务调度'},
 {id:'ml-core',title:'机器学习计算基础',audience:'AI工程常用模块',tasks:['matrix_multiply','linear_regression_step','softmax','binary_cross_entropy','confusion_matrix','batch_norm_inference','conv2d_valid','kmeans_assign','attention'],why:'训练循环、分类评估、特征聚类与神经网络推理'},
@@ -118,7 +118,7 @@ export const TASK_APPLICATIONS={
 TASK_PROGRESSIONS.push(
 {id:'arrays-two-pointers',title:'数组与双指针高频题',audience:'面试高频 / 数据处理',tasks:['move_zeroes','rotate_array','container_water','product_except_self','three_sum'],why:'数组整理、空间优化、双指针扫描与组合搜索'},
 {id:'hash-window-strings',title:'哈希、滑动窗口与字符串',audience:'面试高频 / 文本与日志处理',tasks:['valid_anagram','group_anagrams','longest_substring','subarray_sum','longest_palindrome'],why:'字符频次、日志窗口、连续区间统计与文本分析'},
-{id:'stack-patterns',title:'栈与单调栈',audience:'面试高频 / 在线数据流',tasks:['min_stack','daily_temperatures'],why:'维护实时最值、下一个更大元素与单调结构'},
+{id:'stack-patterns',title:'栈与单调栈',audience:'面试高频 / 在线数据流',tasks:['parentheses','min_stack','daily_temperatures'],why:'维护实时最值、下一个更大元素与单调结构'},
 {id:'linked-lists',title:'链表操作与双指针',audience:'面试高频 / 指针结构',tasks:['reverse_linked_list','merge_two_lists','linked_list_cycle','remove_nth_from_end','reorder_list'],why:'链表维护、合并、环检测与多操作组合'},
 {id:'binary-trees',title:'二叉树递归与遍历',audience:'面试高频 / 层次结构',tasks:['max_depth_tree','invert_tree','level_order_tree','validate_bst','kth_smallest_bst','tree_diameter','lowest_common_ancestor'],why:'树结构查询、遍历、搜索性质与递归信息复用'},
 {id:'grid-graphs',title:'网格搜索与拓扑排序',audience:'面试高频 / 地图与依赖',tasks:['number_of_islands','rotting_oranges','course_schedule'],why:'图连通性、网格传播、依赖关系和环检测'},
