@@ -49,7 +49,7 @@ export function referenceCore(id,d){
  case 'reverse_linked_list':return reverseList(d);
  case 'merge_two_lists':return mergeLists(d);
  case 'linked_list_cycle':{const next=d.next;let slow=d.head??null,fast=d.head??null;while(fast!==null&&next[fast]!==null){slow=next[slow];fast=next[next[fast]];if(slow===fast)return true;}return false;}
- case 'remove_nth_from_end':{const next=d.nodes.map(x=>x.next??null);let head=d.head??null,fast=head,slow=head,prev=null;for(let i=0;i<d.n;i++)fast=fast===null?null:next[fast];while(fast!==null){fast=next[fast];prev=slow;slow=next[slow];}if(prev===null)head=slow===null?null:next[slow];else if(slow!==null)next[prev]=next[slow];return {head,next};}
+ case 'remove_nth_from_end':{const next=d.nodes.map(x=>x.next??null);let head=d.head??null,fast=head,slow=head,prev=null;for(let i=0;i<d.n;i++)fast=fast===null?null:next[fast];while(fast!==null){fast=next[fast];prev=slow;slow=next[slow];}if(prev===null)head=slow===null?null:next[slow];else if(slow!==null)next[prev]=next[slow];if(slow!==null)next[slow]=null;return {head,next};}
  case 'max_depth_tree':return treeDepth(d.root);
  case 'invert_tree':return invertTree(d.root);
  case 'level_order':return levelOrder(d.root);
