@@ -24,7 +24,7 @@ async function sync(){
  if(!user||!sb){cache();return;}if(inFlight||pendingConflict)return;
  inFlight=true;const generation=epoch;
  try{
-  if(!dirty){const r=await remote();if(generation!==epoch)return;if(r.version!==version){data=r.payload;base=structuredClone(data);version=r.version;cache();if(!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))render();}setBanner('云端已同步 · '+new Date().toLocaleTimeString('zh-CN'));return;}
+  if(!dirty){const beforeRead=revision;const r=await remote();if(generation!==epoch)return;if(revision!==beforeRead||dirty)return;if(r.version!==version){data=r.payload;base=structuredClone(data);version=r.version;cache();if(!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))render();}setBanner('云端已同步 · '+new Date().toLocaleTimeString('zh-CN'));return;}
   for(let i=0;i<3;i++){
    const sent=structuredClone(data),editRevision=revision;
    const {data:r,error}=await sb.rpc('rl_save_workspace',{p_payload:sent,p_expected:version});if(error)throw error;if(generation!==epoch)return;
@@ -34,7 +34,7 @@ async function sync(){
  }finally{inFlight=false;if(user&&dirty&&!pendingConflict)timer=setTimeout(()=>sync().catch(e=>setBanner('同步失败：'+e.message,'bad')),1800);}
 }
 async function activate(session,recovery=false){
- const next=session?.user||null;if(user?.id===next?.id&&!recovery)return;
+ const next=session?.user||null;if(user&&next&&user.id===next.id&&!recovery)return;
  epoch++;clearTimeout(timer);inFlight=false;pendingConflict=null;user=next;jobs=[];loadCache();
  $('identity').textContent=user?.email||'访客 · 仅本机保存';$('auth-open').hidden=!!user;$('logout').hidden=!user;
  if(user){$('auth-dialog').close();try{await loadCloud();await history();}catch(e){setBanner('登录成功，但档案加载失败：'+e.message,'bad');}}
