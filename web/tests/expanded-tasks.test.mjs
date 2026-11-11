@@ -38,6 +38,6 @@ test('robotics and research metrics have explicit edge cases',()=>{
  assert.deepEqual(referenceAdvanced('occupancy_grid_index',{x:-.1,y:0,resolution:1,origin:[0,0],width:4,height:4}),null);
  assert.equal(referenceAdvanced('path_length',{points:[[0,0,0]]}),0);
  assert.equal(referenceAdvanced('recall_at_k',{ranked:['a','a','b'],relevant:['a','b'],k:2}),.5);
- assert.equal(referenceAdvanced('average_precision',{ranked:['a','a','b'],relevant:['a','b']}),5/6);
+ assert.ok(Math.abs(referenceAdvanced('average_precision',{ranked:['a','a','b'],relevant:['a','b']})-5/6)<1e-12);
  assert.equal(referenceAdvanced('paired_mean_difference',{baseline:[1,2],method:[2,4]}),1.5);
 });
