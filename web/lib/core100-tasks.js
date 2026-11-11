@@ -122,7 +122,7 @@ function randomString(n,alphabet='abcd'){return Array.from({length:n},()=>alphab
 function randomTree(depth=0,max=4){if(depth>=max||ri(0,4)===0)return null;return {val:ri(-20,20),left:randomTree(depth+1,max),right:randomTree(depth+1,max)};}
 function randomBst(){const vals=[...new Set(Array.from({length:ri(1,10)},()=>ri(-30,30)))].sort((a,b)=>a-b);let root=null;for(const val of vals){if(!root){root={val,left:null,right:null};continue;}let p=root;while(true){const side=val<p.val?'left':'right';if(!p[side]){p[side]={val,left:null,right:null};break;}p=p[side];}}return root;}
 function linked(nodes){return {nodes:nodes.map((val,i)=>({val,next:i+1<nodes.length?i+1:null})),head:nodes.length?0:null};}
-function randomInputCore(id){
+export function randomInputCore(id){
  const nums=(n,lo=-10,hi=10)=>Array.from({length:n},()=>ri(lo,hi));
  switch(id){
  case 'contains_duplicate':return {nums:nums(ri(0,25))};
