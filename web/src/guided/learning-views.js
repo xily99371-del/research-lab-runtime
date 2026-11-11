@@ -1,7 +1,7 @@
 import {GUIDES,EXACT_LINKS,enrichCourses} from './catalog.js';
 import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit} from './model.js';
 import {richText} from './math.js';
-import {taskReadiness,nextReadinessStep} from './assessment-path.js';
+import {taskReadiness,TASK_PATHS} from './assessment-path.js';
 import './learning.css';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
@@ -38,7 +38,7 @@ function evidenceForm(ctx,id,key,labels){
  const submit=()=>{if(fields.some(([,x])=>!x.value.trim())){status.textContent='请把实现、实际结果和解释分别填写；不能仅凭勾选标记完成。';return;}edit(ctx,id,p=>{p.evidence||={};p.evidence[key]={...Object.fromEntries(fields.map(([k,x])=>[k,x.value])),submittedAt:new Date().toISOString(),verification:'self-submitted',assisted:key==='independent'&&!!p.independentHelpUsed};if(key==='transfer'){p.review={dueAt:new Date(Date.now()+86400000).toISOString(),completed:0};}});status.textContent='证据已提交。代码行为测试和人工复核仍独立记录。';ctx.notify('已保存学习证据');};
  wrap.append(group('actions',button('提交本阶段证据',submit,'primary')),status);return wrap;
 }
-function linkedTasks(ctx,id){return ctx.problems.filter(p=>(EXACT_LINKS[id]||[]).includes(p.id));}
+function linkedTasks(ctx,id){return ctx.problems.filter(p=>(TASK_PATHS[p.id]?.courses||[]).includes(id));}
 function readinessCard(ctx,task){
  const r=taskReadiness(task.id,ctx.data.progress),wrap=group('assessment-path-card');
  const passed=ctx.jobs.some(j=>j.task_id===task.id&&j.status==='passed');
