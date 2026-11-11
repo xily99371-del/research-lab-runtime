@@ -98,7 +98,7 @@ function reportView(report){const human=humanizeReport(report),wrap=box('learn-r
  for(const c of report.cases||[]){const d=el('details',null,'learn-details');d.append(el('summary',(c.pass?'✓ ':'× ')+(c.name||c.test||'测试')));if(c.input!==undefined)d.append(el('pre',JSON.stringify({input:c.input,expected:c.expected,actual:c.actual},null,2),'code-output'));else d.append(el('p','隐藏测试只展示结果，不泄露完整输入与答案。','muted'));wrap.append(d);}
  const raw=el('details',null,'learn-details');raw.append(el('summary','查看原始评测报告'),el('pre',JSON.stringify(report,null,2),'code-output'));wrap.append(raw);return wrap;}
 function renderCode(root){
- root.append(hero('任务中心：选择练习方式，再开始动手。','课程实践按五个阶段逐步推进；26道在线题目由隔离运行器检查程序行为。开放实验提交代码、实际结果与解释，不伪装成自动评分。'));
+ root.append(hero('任务中心：选择练习方式，再开始动手。','课程实践按五个阶段逐步推进；100道递进式题目由隔离运行器检查程序行为。开放实验提交代码、实际结果与解释，不伪装成自动评分。'));
  root.append(box('actions',btn('自动评测任务（'+PROBLEMS.length+'）',()=>{taskMode='code';render();},taskMode==='code'?'primary':''),btn('课程实践任务（'+courses.length+'）',()=>{taskMode='project';render();},taskMode==='project'?'primary':'')));
  if(taskMode==='project'){renderLearningPractice(root,context());return;}
  const filter=(values,current,label,callback)=>{const s=el('select');s.setAttribute('aria-label',label);for(const value of values){const o=el('option',value);s.append(o);}s.value=current;s.onchange=()=>{callback(s.value);render();};return s;};
