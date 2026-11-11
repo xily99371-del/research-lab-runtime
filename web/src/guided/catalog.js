@@ -8,11 +8,11 @@ export const GUIDE_LIST=[...FOUNDATIONS,...MACHINE_LEARNING,...VISION,...MULTIMO
 export const GUIDES=Object.fromEntries(GUIDE_LIST.map(g=>[g.id,g]));
 if(GUIDE_LIST.length!==96||Object.keys(GUIDES).length!==96)throw Error('The guided curriculum must cover the 96 existing IDs exactly.');
 export const EXACT_LINKS={
- u2:['two_sum','parentheses','top_k','union_find','sliding_window_max'],
- u3:['bfs','dijkstra','astar','topological_sort','connected_components'],
- u4:['knapsack','lcs','coin_change','lis','max_subarray','merge_intervals','interval_scheduling','edit_distance'],
- u9:['matrix_multiply'],
- u15:['binary_search','kmp'],
+ u2:['two_sum','contains_duplicate','valid_anagram','group_anagrams','product_except_self','move_zeroes','three_sum','container_water','longest_substring','daily_temperatures','top_k','union_find','sliding_window_max','linked_list_cycle','remove_nth_from_end','merge_two_lists','reverse_linked_list','k_closest_points'],
+ u3:['bfs','dijkstra','astar','topological_sort','connected_components','max_depth_tree','invert_tree','level_order','validate_bst','kth_smallest_bst','num_islands','word_ladder_length','course_schedule','oranges_rotting'],
+ u4:['knapsack','lcs','coin_change','lis','max_subarray','merge_intervals','interval_scheduling','edit_distance','best_time_stock','largest_rectangle','subsets','combination_sum','permutations','word_search','house_robber','unique_paths','min_path_sum','jump_game','gas_station','word_break'],
+ u9:['matrix_multiply','product_except_self','median_two_sorted_arrays'],u11:['eval_rpn'],u8:['reverse_linked_list','merge_two_lists'],u31:['num_islands','word_search'],
+ u15:['binary_search','kmp','min_window','search_rotated','find_min_rotated','median_two_sorted_arrays'],
  u16:['linear_regression_step','binary_cross_entropy'],
  u19:['kmeans_assign'],
  u20:['softmax'],
