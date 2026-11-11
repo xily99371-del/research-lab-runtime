@@ -13,14 +13,18 @@ try{
  const pathFilter=page.locator('select[aria-label="递进训练路径"]');assert.equal(await pathFilter.count(),1);
  await pathFilter.selectOption({label:'图搜索与路径规划'});
  assert.equal(await page.locator('.task-list .task-item').count(),6);
- await page.locator('.task-item[data-task="bfs"]').click();
+ const graphOrder=await page.locator('.task-list .task-item').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('data-task')));
+ assert.deepEqual(graphOrder,['connected_components','bfs','union_find','topological_sort','dijkstra','astar']);
+ await page.locator('.task-item[data-task="connected_components"]').click();
  assert.ok(await page.getByText(/第 1\/6 关/).count()>0);
  assert.ok(await page.getByText(/实际应用：/).count()>0);
  await page.getByRole('button',{name:/下一关：/}).click();
- assert.equal(await page.locator('.task-item.active[data-task="connected_components"]').count(),1);
+ assert.equal(await page.locator('.task-item.active[data-task="bfs"]').count(),1);
  await pathFilter.selectOption({label:'全部'});
  const items=page.locator('.task-list .task-item');
  assert.equal(await items.count(),100);
+ assert.equal(await page.locator('.task-item[data-task="jump_game"]').count(),1);
+ assert.equal(await page.locator('.task-item[data-task="longest_increasing_subsequence"]').count(),0);
  const categories=new Set(),levels=new Set(),samples=[];
  for(let i=0;i<100;i++){
   const item=items.nth(i),id=await item.getAttribute('data-task');
