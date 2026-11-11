@@ -9,7 +9,7 @@ import {LEGACY_LESSON_FORMULAS} from './lesson-formulas.js';
 import {enrichCourses,GUIDES,EXACT_LINKS} from './guided/catalog.js';
 import {renderJourneyHome,renderLearningCourses,renderLearningPractice,focusCourse,humanizeReport} from './guided/learning-ui.js';
 import {richText} from './guided/math.js';
-import {taskReadiness} from './guided/assessment-path.js';
+import {taskReadiness,TASK_PATHS} from './guided/assessment-path.js';
 import 'katex/dist/katex.min.css';
 Object.assign(LESSONS,ADVANCED_LESSONS,REMAINING_LESSONS,ROS_MIDDLEWARE_LESSON);
 for(const [id,l]of Object.entries(LESSONS))l.formula ||= LEGACY_LESSON_FORMULAS[id];
@@ -121,7 +121,7 @@ function renderCode(root){
  else pathPanel.append(note('这是一条学习建议，不是强制门槛。你可以提前挑战；若暂时做不出来，先补上方标出的课程步骤。','warn'));
  pathPanel.append(box('actions',btn(readiness.ready?'准备好了，开始评测':'我想提前挑战这道题',()=>{$('code-editor')?.scrollIntoView({block:'center',behavior:'smooth'});$('code-editor')?.focus();},'primary')));
  detail.append(pathPanel);
- const related=courses.filter(c=>(EXACT_LINKS[c.id]||[]).includes(p.id));for(const c of related.slice(0,3))detail.append(btn('回到分步课程：'+c.title,()=>openCourse(c.id)));
+ const related=(TASK_PATHS[p.id]?.courses||[]).map(id=>courses.find(c=>c.id===id)).filter(Boolean);for(const c of related)detail.append(btn('回到分步课程：'+c.title,()=>openCourse(c.id)));
  const lang=el('select');lang.id='code-language';lang.setAttribute('aria-label','提交代码语言');for(const l of p.langs){const o=el('option',l==='cpp'?'C++17':l==='ros2_python'?'ROS 2 Python':'Python 3');o.value=l;lang.append(o);}lang.value=language;lang.onchange=()=>{language=lang.value;render();};lang.disabled=running;
  const editor=el('textarea');editor.id='code-editor';editor.className='field editor';editor.spellcheck=false;editor.setAttribute('aria-label','代码编辑器');const draft=data.drafts[p.id+'-'+language];editor.value=typeof draft==='string'?draft:starter(language);editor.oninput=()=>{data.drafts[p.id+'-'+language]=editor.value;changed();};editor.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();submitCode();}};
  const submit=btn(running?'正在评测…':'提交并运行测试',submitCode,'primary');submit.disabled=running;
