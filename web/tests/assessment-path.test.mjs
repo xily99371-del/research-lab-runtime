@@ -2,12 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PROBLEMS} from '../src/problems.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
+import {CORE100_PROBLEMS} from '../src/core100-problems.js';
 import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
 
 test('every automatic task has an explicit course path',()=>{
- assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length);
- for(const p of PROBLEMS){const path=TASK_PATHS[p.id];assert.ok(path,p.id);assert.ok(path.courses.length>0,p.id);assert.ok(path.why.length>5,p.id);}
+ assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length+CORE100_PROBLEMS.length);
+ for(const p of [...PROBLEMS,...EXPANDED_PROBLEMS,...CORE100_PROBLEMS]){const path=TASK_PATHS[p.id];assert.ok(path,p.id);assert.ok(path.courses.length>0,p.id);assert.ok(path.why.length>5,p.id);}
 });
 test('readiness requires both worked-example check and guided practice evidence',()=>{
  const progress={u9:{learning:{checks:{worked:{passed:true}}}}};
