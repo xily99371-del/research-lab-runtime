@@ -1,4 +1,4 @@
-# Research Lab 4.1
+# Research Lab 4.2
 
 Research Lab is a research-learning workspace combining structured teaching, mathematical derivations, selectable practice tasks, code evaluation, ROS 2 integration checks, and versioned Supabase learning records.
 
@@ -47,3 +47,11 @@ Vercel project: research-lab-learning; root directory: web; Node 22; build comma
 - 训练路径覆盖数组/哈希/滑动窗口、栈/二分/字符串、图搜索、动态规划/贪心、机器学习计算、视觉几何、点云三维、大模型基础、机器人状态与导航、科研评价。
 - 题目页显示路径关卡、总关数、应用场景，并可直接跳转上一关/下一关；可以按路径筛选，仍支持方向、难度、语言与关键词过滤。
 - 难度不以题面长度衡量：从单一原语、边界处理，递进到多个算法组合和工程约束。研究级题目保留，但不强行混入面试基础路径。
+
+
+## Research Lab 4.2 — 100题递进题库
+- 自动评测由60道扩充至100道，原60道AI/CV/3D/机器人/科研题全部保留，新增40道高频算法与数据结构题。
+- 新增覆盖数组哈希、双指针、滑动窗口、字符串、单调栈、链表、二叉树、网格图、回溯、二分查找和动态规划。
+- 题库不是对LeetCode官方Hot 100的逐题复制，而是参考其高频模式组织，并结合真实工程场景编写独立题目与测试契约。
+- 100道题按18条递进路径组织；每题有路径关卡、课程准备映射、实际应用说明、公开样例和随机隐藏测试。
+- 新增题目支持Python与C++17，使用原有隔离运行器。ROS 2的4道真实节点集成任务保持不变。
