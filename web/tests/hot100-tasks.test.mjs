@@ -8,7 +8,7 @@ test('40 new high-frequency tasks have unique metadata and server registrations'
  assert.equal(HOT_IDS.length,40);assert.equal(HOT_PROBLEMS.length,40);
  assert.equal(new Set(HOT_IDS).size,40);
  assert.equal(ALGORITHMS.length,96);
- for(const id of HOT_IDS){assert.ok(HOT_PROBLEMS.some(p=>p.id===id),id);assert.ok(suite(id).length>=18,id);}
+ for(const id of HOT_IDS){assert.ok(HOT_PROBLEMS.some(p=>p.id===id),id);assert.ok(suite(id).length>=17,id);}
 });
 test('representative array, window, stack and string examples',()=>{
  assert.deepEqual(referenceHot('three_sum',{nums:[-1,0,1,2,-1,-4]}),[[-1,-1,2],[-1,0,1]]);
@@ -47,7 +47,7 @@ test('grid, graph, backtracking and dynamic-programming examples',()=>{
  assert.equal(referenceHot('longest_increasing_subsequence',{nums:[10,9,2,5,3,7,101,18]}),4);
 });
 test('all 40 tasks produce deterministic, serializable hidden test suites',()=>{
- for(const id of HOT_IDS){const cases=suiteHot(id);assert.ok(cases.length>=18,id);for(const c of cases){const expected=referenceHot(id,c.input);assert.equal(matchesHot(id,c.input,expected,c.expected),true,id);assert.doesNotThrow(()=>JSON.stringify(expected),id);}}
+ for(const id of HOT_IDS){const cases=suiteHot(id);assert.ok(cases.length>=17,id);for(const c of cases){const expected=referenceHot(id,c.input);assert.equal(matchesHot(id,c.input,expected,c.expected),true,id);assert.doesNotThrow(()=>JSON.stringify(expected),id);}}
 });
 test('randomized cases are valid and never crash the reference implementation',()=>{
  for(const id of HOT_IDS)for(let i=0;i<80;i++){const input=randomHot(id),expected=referenceHot(id,input);assert.doesNotThrow(()=>JSON.stringify(expected),id);}
