@@ -2,7 +2,10 @@ import {createClient} from '@supabase/supabase-js';
 import {emptyState,normalize,merge3} from './state.js';
 import {PROBLEMS,starter} from './problems.js';
 import {EXPANDED_PROBLEMS} from './expanded-problems.js';
-PROBLEMS.push(...EXPANDED_PROBLEMS);
+import {CORE100_PROBLEMS} from './core100-problems.js';
+import {applyTaskMeta,TIER_INFO,TASK_META} from './task-meta.js';
+PROBLEMS.push(...EXPANDED_PROBLEMS,...CORE100_PROBLEMS);
+PROBLEMS.splice(0,PROBLEMS.length,...applyTaskMeta(PROBLEMS));
 import {LESSONS} from './lessons.js';
 import {ADVANCED_LESSONS} from './advanced-lessons.js';
 import {REMAINING_LESSONS} from './remaining-lessons.js';
@@ -24,7 +27,7 @@ const field=(label,value='',type='text',id='')=>{const l=el('label',label,'learn
 const note=(text,kind='')=>el('div',text,'notice '+kind);
 const hero=(h,p)=>box('hero',el('small','PERSONAL RESEARCH WORKSPACE'),el('h2',h),el('p',p));
 let sb=null,config=null,user=null,session=null,courses=[],data=emptyState(),base=emptyState(),version=0,dirty=false,inFlight=false,pendingConflict=null,jobs=[];
-let epoch=0,revision=0,timer=null,toastTimer=null,page='dashboard',selectedTask='attention',taskTrack='全部',taskLevel='全部',taskLang='全部',taskQuery='',language='python',taskMode='code',running=false;
+let epoch=0,revision=0,timer=null,toastTimer=null,page='dashboard',selectedTask='two_sum',taskTrack='全部',taskPath='核心算法',taskTier='全部',taskLang='全部',taskQuery='',language='python',taskMode='code',running=false;
 const reports=new Map();
 // Keep the old cache namespace so guest drafts and logged-in offline edits survive.
 const cacheKey=()=> 'research-lab-v34:'+(user?.id||'guest');
@@ -86,7 +89,7 @@ function openCourseStage(id,stage){
  const old=data.progress[id]||{},learning={...(old.learning||{}),stage,startedAt:(old.learning||{}).startedAt||new Date().toISOString()};
  data.progress[id]={...old,learning};changed();navigate('courses');
 }
-function openTask(id){selectedTask=id;taskMode='code';taskTrack='全部';taskLevel='全部';taskQuery='';taskLang='全部';navigate('code');}
+function openTask(id){selectedTask=id;taskMode='code';taskTrack='全部';taskPath=TASK_META[id]?.path||'全部';taskTier='全部';taskQuery='';taskLang='全部';navigate('code');}
 function rerenderWithFocus(id){const a=$(id),start=a?.selectionStart,end=a?.selectionEnd;render();const b=$(id);if(b){b.focus();if(start!=null)try{b.setSelectionRange(start,end);}catch{}}}
 function reportView(report){const human=humanizeReport(report),wrap=box('learn-report');wrap.setAttribute('role','status');wrap.append(el('h3',human.title),note(human.message+(report.persisted===false?' 成绩尚未成功入库；请保存本次原始报告。':''),report.pass?'ok':'warn'),el('p',human.help,'muted'));
  if(report.passed!==undefined)wrap.append(el('p','通过 '+report.passed+'/'+report.total+' 个测试；评分 '+report.score+'。','muted'));
@@ -100,15 +103,24 @@ function renderCode(root){
  if(taskMode==='project'){renderLearningPractice(root,context());return;}
  const filter=(values,current,label,callback)=>{const s=el('select');s.setAttribute('aria-label',label);for(const value of values){const o=el('option',value);s.append(o);}s.value=current;s.onchange=()=>{callback(s.value);render();};return s;};
  const search=el('input');search.id='code-search';search.placeholder='搜索题目、输入输出或概念';search.value=taskQuery;const searchUpdate=e=>{if(e.isComposing)return;taskQuery=search.value;rerenderWithFocus('code-search');};search.oninput=searchUpdate;search.oncompositionend=searchUpdate;
- root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'评测方向',v=>taskTrack=v),filter(['全部','基础','进阶','研究级'],taskLevel,'评测难度',v=>taskLevel=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
+ const pathOrder={'核心算法':0,'AI/机器人专题':1,'ROS 2系统集成':2};
+ const psAll=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskPath==='全部'||p.path===taskPath)&&(taskTier==='全部'||p.tier===Number(taskTier[1]))&&(taskLang==='全部'||p.langs.includes({'Python':'python','C++17':'cpp','ROS 2 Python':'ros2_python'}[taskLang]))&&(p.title+' '+p.desc+' '+p.concept+' '+(p.application||'')+' '+(p.pattern||'')).toLowerCase().includes(taskQuery.toLowerCase())).sort((a,b)=>a.tier-b.tier||(pathOrder[a.path]-pathOrder[b.path])||a.sequence-b.sequence);
+ const journey=box('task-journey card');
+ journey.append(el('strong','高频算法递进路线'),el('p','先沿核心算法主线逐级掌握常见题型，再进入AI、三维视觉与机器人专题。每一级都以前一级的基本功为基础。','muted'));
+ const tiers=box('task-tier-grid');
+ const passedIds=new Set(jobs.filter(j=>j.status==='passed').map(j=>j.task_id));
+ for(let level=1;level<=5;level++){const members=PROBLEMS.filter(p=>p.path==='核心算法'&&p.tier===level),done=members.filter(p=>passedIds.has(p.id)).length;const card=btn('',()=>{taskPath='核心算法';taskTier='L'+level+' '+TIER_INFO[level].label;render();},'task-tier-card '+(taskPath==='核心算法'&&taskTier.startsWith('L'+level)?'active':''));card.append(el('span','L'+level,'task-tier-code'),el('b',TIER_INFO[level].label),el('small',done+'/'+members.length+' 题通过'),el('small',TIER_INFO[level].summary));tiers.append(card);}
+ journey.append(tiers);
+ root.append(journey);
+ root.append(box('learn-toolbar',filter(['全部',...new Set(PROBLEMS.map(p=>p.track))],taskTrack,'技术方向',v=>taskTrack=v),filter(['全部','核心算法','AI/机器人专题','ROS 2系统集成'],taskPath,'学习路线',v=>taskPath=v),filter(['全部','L1 入门','L2 基础','L3 进阶','L4 综合','L5 挑战'],taskTier,'递进难度',v=>taskTier=v),filter(['全部','Python','C++17','ROS 2 Python'],taskLang,'评测语言',v=>taskLang=v),search));
  const langKey={'Python':'python','C++17':'cpp','ROS 2 Python':'ros2_python'};
- const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept).toLowerCase().includes(taskQuery.toLowerCase()));
+ const ps=psAll;
  if(!ps.some(p=>p.id===selectedTask))selectedTask=ps[0]?.id;
  const list=box('card task-list'),detail=box('card task-detail');
- for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;const readiness=taskReadiness(p.id,data.progress);b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+p.level+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
+ for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;b.dataset.tier=''+p.tier;b.dataset.path=p.path;const readiness=taskReadiness(p.id,data.progress);b.append(el('b',(passed?'✓ ':'')+p.title),el('small','L'+p.tier+' '+p.tierLabel+' · '+p.pattern),el('small',p.path+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
  const p=PROBLEMS.find(p=>p.id===selectedTask);if(!p){detail.append(el('p','没有匹配的评测题。这个方向也可能有课程实践任务。'),btn('转到课程实践',()=>{taskMode='project';render();}));root.append(box('task-grid',list,detail));return;}
  if(!p.langs.includes(language))language=p.langs[0];if(taskLang!=='全部'&&p.langs.includes(langKey[taskLang]))language=langKey[taskLang];
- detail.append(el('span',p.track+' · '+p.level,'pill blue'),el('h2',p.title),richText(p.desc),el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','为什么这样做'),richText(p.concept));
+ detail.append(el('span','L'+p.tier+' '+p.tierLabel+' · '+p.path,'pill blue'),el('h2',p.title),el('p','算法模式：'+p.pattern,'muted'),el('h3','题目与输入输出'),richText(p.desc),el('h3','实际应用'),el('p',p.application||'将算法用于真实数据处理与工程任务。'),el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','核心思路与复杂度'),richText(p.concept));
  const readiness=taskReadiness(p.id,data.progress),pathPanel=box('assessment-readiness');
  pathPanel.append(el('h3','开始自动评测前：你的课程准备度'));
  pathPanel.append(el('p',readiness.why+'。建议达到：关联课程的例题核对正确，并完成带提示练习、提交实际输出与解释。','muted'));
