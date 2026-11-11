@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {normalize,emptyState,merge3} from '../src/state.js';
 import {reference,matches,suite,ALGORITHMS,ROS} from '../lib/tasks.js';
 import {PROBLEMS} from '../src/problems.js';
+import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {LESSONS} from '../src/lessons.js';
 import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
 import {REMAINING_LESSONS} from '../src/remaining-lessons.js';
@@ -14,7 +15,7 @@ test('workspace normalization and safe keys',()=>{assert.deepEqual(normalize(nul
 test('disjoint device edits merge',()=>{const b=emptyState(),l=structuredClone(b),r=structuredClone(b);l.progress.u1={note:'A'};r.progress.u2={note:'B'};const x=merge3(b,l,r);assert.equal(x.conflicts.length,0);assert.equal(x.value.progress.u1.note,'A');assert.equal(x.value.progress.u2.note,'B');});
 test('same field conflict is surfaced',()=>{const b={note:'old'},l={note:'mine'},r={note:'other'};assert.equal(merge3(b,l,r).conflicts.length,1);});
 test('all 96 course IDs are unique and stable',()=>{assert.equal(courses.length,96);assert.equal(new Set(courses.map(x=>x.id)).size,96);assert.equal(courses[0].id,'u1');assert.equal(courses[95].id,'u96');});
-test('task bank covers all algorithm IDs',()=>{assert.equal(PROBLEMS.length,26);assert.deepEqual(new Set(PROBLEMS.filter(x=>x.langs.includes('ros2_python')).map(x=>x.id)),new Set(ROS));for(const id of ALGORITHMS){assert.ok(PROBLEMS.some(p=>p.id===id));}});
+test('task bank covers all algorithm IDs',()=>{const all=[...PROBLEMS,...EXPANDED_PROBLEMS];assert.equal(all.length,60);assert.equal(new Set(all.map(p=>p.id)).size,60);assert.equal(all.filter(x=>x.langs.includes('ros2_python')).length,4);assert.deepEqual(new Set(all.filter(x=>x.langs.includes('ros2_python')).map(x=>x.id)),new Set(ROS));for(const id of ALGORITHMS){assert.ok(all.some(p=>p.id===id),id);}});
 test('every algorithm suite validates its reference',()=>{for(const id of ALGORITHMS){const s=suite(id);assert.ok(s.length>=10,id);for(const t of s)assert.equal(matches(id,t.input,reference(id,t.input),t.expected),true,id);}});
 test('two-sum accepts reversed valid indices',()=>assert.equal(matches('two_sum',{nums:[2,7],target:9},[1,0],[0,1]),true));
 test('attention mask produces finite zero row',()=>assert.deepEqual(reference('attention',{q:[[999]],k:[[999]],v:[[4]],mask:[[false]]}),[[0]]));
