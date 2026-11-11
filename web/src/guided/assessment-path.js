@@ -102,7 +102,7 @@ three_sum:{courses:['u2'],why:'排序、双指针与重复组合去重'},
  house_robber:{courses:['u4'],why:'相邻约束与动态规划状态转移'},
  unique_paths:{courses:['u4'],why:'网格动态规划与滚动数组'},
  decode_ways:{courses:['u4'],why:'字符串动态规划与前导零边界'},
- longest_increasing_subsequence:{courses:['u4'],why:'贪心维护tails与二分查找'}
+ jump_game:{courses:['u4'],why:'贪心维护最远可达边界与提前终止'}
 };
 
 export function taskReadiness(taskId,progress={}){

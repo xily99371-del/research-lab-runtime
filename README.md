@@ -7,11 +7,11 @@ Research Lab is a research-learning workspace combining structured teaching, mat
 - All 96 units now have lesson records: 30 original detailed lessons and 66 newly authored lessons.
 - Each lesson includes core explanations, mathematical expressions, understanding checks, references, and implementation/research practice.
 - KaTeX renders inline and display mathematics.
-- The task center separates 96 open-ended course-practice tasks from 26 automatically graded tasks.
+- The task center separates 96 staged course-practice units from 100 automatically graded tasks; every online task maps to prerequisite lessons.
 - The new 66 lessons cover operating systems, networking, C++ and compilers; ML, RL and representation learning; segmentation, matching, 3D detection, diffusion, tracking, VO, NeRF and Gaussian Splatting; LLM pretraining, inference, RAG, VLA, world models and efficient attention; ROS 2 middleware, kinematics, EKF, planning, VIO, manipulation and imitation learning; and research design, causal ablation, reproducibility, ethics, review and communication.
 
 ## Automatic evaluation
-- 22 algorithm tasks in Python/C++ and 4 ROS 2 Python integration tasks.
+- 96 algorithm tasks in Python/C++17 and 4 ROS 2 Python integration tasks.
 - Randomized hidden cases for algorithm submissions.
 - Python and C++17 run in disposable network-denied sandboxes.
 - ROS 2 tasks use a ROS 2 Jazzy microVM and integration probes.
@@ -23,7 +23,7 @@ Behavioral tests do not prove algorithmic complexity, mathematical understanding
 Run npm ci, npm test and npm run build from the web directory.
 The regression suite verifies all 96 curriculum IDs have lesson content and equations, all algorithm suites, task mappings, and workspace merge behavior.
 
-Vercel project: research-lab-learning; root directory: web; Node 22; build command: npm test && npm run build; output directory: public.
+Vercel project: research-lab-learning; root directory: web; Node 22; build command: npm run build (the build script runs the regression suite); output directory: public.
 
 
 ## Course-to-assessment bridge (3.7)
@@ -53,5 +53,6 @@ Vercel project: research-lab-learning; root directory: web; Node 22; build comma
 - 自动评测由60道扩充至100道，原60道AI/CV/3D/机器人/科研题全部保留，新增40道高频算法与数据结构题。
 - 新增覆盖数组哈希、双指针、滑动窗口、字符串、单调栈、链表、二叉树、网格图、回溯、二分查找和动态规划。
 - 题库不是对LeetCode官方Hot 100的逐题复制，而是参考其高频模式组织，并结合真实工程场景编写独立题目与测试契约。
-- 100道题按18条递进路径组织；每题有路径关卡、课程准备映射、实际应用说明、公开样例和随机隐藏测试。
+- 100道题按18条训练路径组织；每条路径内部按难度非递减排序，并在构建时自动校验。每题有路径关卡、课程准备映射、实际应用说明、公开样例和随机隐藏测试。
+- 用 Jump Game 替换与既有 LIS 重复的题目，补充贪心可达性判断这一高频模式。
 - 新增题目支持Python与C++17，使用原有隔离运行器。ROS 2的4道真实节点集成任务保持不变。

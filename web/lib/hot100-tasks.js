@@ -9,7 +9,7 @@ export const HOT_IDS=[
 'number_of_islands','rotting_oranges','course_schedule',
 'subsets','permutations','combination_sum','word_search',
 'search_rotated','find_min_rotated','kth_largest','merge_sorted_array',
-'climbing_stairs','house_robber','unique_paths','decode_ways','longest_increasing_subsequence'
+'climbing_stairs','house_robber','unique_paths','decode_ways','jump_game'
 ];
 const ri=(a,b)=>randomInt(a,b+1);
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -59,7 +59,7 @@ export function referenceHot(id,d){
  case 'house_robber':{let a=0,b=0;for(const x of d.nums){const c=Math.max(b,a+x);a=b;b=c;}return b;}
  case 'unique_paths':{const row=Array(d.n).fill(1);for(let i=1;i<d.m;i++)for(let j=1;j<d.n;j++)row[j]+=row[j-1];return row[d.n-1]??0;}
  case 'decode_ways':{const s=d.s;if(!s.length||s[0]==='0')return 0;let a=1,b=1;for(let i=1;i<s.length;i++){let c=s[i]==='0'?0:b;if(Number(s.slice(i-1,i+1))>=10&&Number(s.slice(i-1,i+1))<=26)c+=a;a=b;b=c;}return b;}
- case 'longest_increasing_subsequence':{const tails=[];for(const x of d.nums){let l=0,r=tails.length;while(l<r){const m=(l+r)>>1;if(tails[m]<x)l=m+1;else r=m;}tails[l]=x;}return tails.length;}
+ case 'jump_game':{const a=d.nums;if(!a.length)return false;let farthest=0;for(let i=0;i<a.length;i++){if(i>farthest)return false;farthest=Math.max(farthest,i+a[i]);if(farthest>=a.length-1)return true;}return true;}
  default:throw new Error('Unknown Hot100 task '+id);
  }
 }
@@ -103,13 +103,14 @@ climbing_stairs:[{n:3},{n:5}],
 house_robber:[{nums:[1,2,3,1]},{nums:[2,7,9,3,1]}],
 unique_paths:[{m:3,n:7}],
 decode_ways:[{s:'226'},{s:'06'}],
-longest_increasing_subsequence:[{nums:[10,9,2,5,3,7,101,18]}]
+jump_game:[{nums:[2,3,1,1,4]},{nums:[3,2,1,0,4]},{nums:[0]},{nums:[0,1]}]
 };return b[id]||[];}
 export function suiteHot(id){const b=baseCases(id);if(!b.length)throw new Error('Missing Hot100 test cases '+id);return [...b.map((input,i)=>({input,public:i<2,expected:referenceHot(id,input)})),...Array.from({length:16},()=>{const input=randomHot(id);return {input,public:false,expected:referenceHot(id,input)};})];}
 export function randomHot(id){
  const ints=(n,lo=-5,hi=10)=>Array.from({length:n},()=>ri(lo,hi));
  switch(id){
- case 'three_sum':case 'product_except_self':case 'move_zeroes':case 'longest_increasing_subsequence':return {nums:ints(ri(0,12))};
+ case 'three_sum':case 'product_except_self':case 'move_zeroes':return {nums:ints(ri(0,12))};
+ case 'jump_game':return {nums:Array.from({length:ri(1,12)},()=>ri(0,5))};
  case 'kth_largest':{const nums=ints(ri(1,12));return {nums,k:ri(1,nums.length)};}
  case 'longest_substring':case 'longest_palindrome':return {text:Array.from({length:ri(0,15)},()=> 'abcde'[ri(0,4)]).join('')};
  case 'container_water':return {height:ints(ri(0,12),0,12)};

@@ -25,12 +25,16 @@ if(result.error||result.status!==0)throw result.error||new Error('Regression tes
 const pkg=JSON.parse(await fs.readFile('package.json','utf8'));
 const original=JSON.parse(await fs.readFile('data/courses.json','utf8'));
 assert.ok(original.length===96&&new Set(original.map(c=>c.id)).size===96,'Invalid course IDs');
-const taskIds=[...PROBLEMS,...EXPANDED_PROBLEMS,...HOT_PROBLEMS].map(p=>p.id);
+const allProblems=[...PROBLEMS,...EXPANDED_PROBLEMS,...HOT_PROBLEMS];
+const taskIds=allProblems.map(p=>p.id);
 assert.equal(taskIds.length,100,'Phase-two task bank must contain exactly 100 tasks');
 assert.equal(new Set(taskIds).size,100,'Duplicate task IDs');
 assert.equal(ALGORITHMS.length,96,'All algorithm tasks must be registered server-side');
 assert.equal(ROS.length,4,'ROS 2 tasks must remain registered');
 for(const id of taskIds)assert.ok(TASK_PATHS[id],'Missing course readiness map for '+id);
+const problemById=new Map(allProblems.map(p=>[p.id,p]));
+const difficultyRank=new Map([['入门',0],['基础',1],['进阶',2],['综合挑战',3],['研究级',4]]);
+for(const path of TASK_PROGRESSIONS){let previous=-1;for(const id of path.tasks){const rank=difficultyRank.get(problemById.get(id)?.level);assert.notEqual(rank,undefined,'Missing difficulty for '+id);assert.ok(rank>=previous,`Difficulty must not decrease in ${path.title}: ${id}`);previous=rank;}}
 const progressionIds=TASK_PROGRESSIONS.flatMap(p=>p.tasks);
 assert.equal(progressionIds.length,taskIds.length,'Every task must be in a progression');
 assert.equal(new Set(progressionIds).size,taskIds.length,'Each task must appear exactly once in progression');
@@ -39,12 +43,16 @@ for(const id of [...ALGORITHMS,...ROS])assert.ok(taskIds.includes(id),'Missing u
 const courses=enrichCourses(original);
 assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must not be identical generic text');
 await fs.mkdir('public',{recursive:true});
-await fs.writeFile('public/index.html',html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,'版本 4.0 · 60道自动评测任务'),'utf8');
+const displayVersion=pkg.version.split('.').slice(0,2).join('.');
+const releaseLabel=`版本 ${displayVersion} · ${taskIds.length}道自动评测任务 · 分阶段学习与证据记录`;
+const publicHtml=html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,releaseLabel);
+assert.ok(publicHtml.includes(releaseLabel),'Release label must reflect the current package and task bank');
+await fs.writeFile('public/index.html',publicHtml,'utf8');
 await fs.copyFile('src/style.css','public/style.css');
 await fs.writeFile('public/courses.json',JSON.stringify(courses),'utf8');
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
 let commitSha=process.env.VERCEL_GIT_COMMIT_SHA||null;
 if(!commitSha)try{commitSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
-const release={version:'4.2.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,progressivePaths:TASK_PROGRESSIONS.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 100 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
+const release={version:pkg.version,packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,progressivePaths:TASK_PROGRESSIONS.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 100 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true,difficultyOrderedPaths:true}};
 await fs.writeFile('public/release.json',JSON.stringify(release),'utf8');
-console.log('Built Research Lab 4.2: 100 tasks including 40 high-frequency interview algorithms, organized into 18 progressive, application-oriented learning paths; legacy records retained.');
+console.log(`Built Research Lab ${pkg.version}: ${taskIds.length} tasks including 40 high-frequency interview algorithms, organized into ${TASK_PROGRESSIONS.length} difficulty-ordered, application-oriented learning paths; legacy records retained.`);

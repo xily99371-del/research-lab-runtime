@@ -44,7 +44,10 @@ test('grid, graph, backtracking and dynamic-programming examples',()=>{
  assert.equal(referenceHot('house_robber',{nums:[2,7,9,3,1]}),12);
  assert.equal(referenceHot('unique_paths',{m:3,n:7}),28);
  assert.equal(referenceHot('decode_ways',{s:'226'}),3);
- assert.equal(referenceHot('longest_increasing_subsequence',{nums:[10,9,2,5,3,7,101,18]}),4);
+ assert.equal(referenceHot('jump_game',{nums:[2,3,1,1,4]}),true);
+ assert.equal(referenceHot('jump_game',{nums:[3,2,1,0,4]}),false);
+ assert.equal(referenceHot('jump_game',{nums:[0]}),true);
+ assert.equal(referenceHot('jump_game',{nums:[0,1]}),false);
 });
 test('all 40 tasks produce deterministic, serializable hidden test suites',()=>{
  for(const id of HOT_IDS){const cases=suiteHot(id);assert.ok(cases.length>=17,id);for(const c of cases){const expected=referenceHot(id,c.input);assert.equal(matchesHot(id,c.input,expected,c.expected),true,id);assert.doesNotThrow(()=>JSON.stringify(expected),id);}}
