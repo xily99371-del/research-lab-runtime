@@ -60,7 +60,34 @@ interval_scheduling:[{intervals:[[1,3],[2,4],[3,5],[6,7]]},{intervals:[]}],
 connected_components:[{n:5,edges:[[0,1],[1,2],[3,4]]},{n:4,edges:[]}],
 edit_distance:[{a:'kitten',b:'sitting'},{a:'',b:'abc'},{a:'abc',b:'abc'}]
 };
-export function suite(id){const base=cases[id];if(!base)throw new Error('No test suite');const out=base.map((input,i)=>({input,public:i<2,expected:reference(id,input)}));for(let i=0;i<10;i++){const input=base[i%base.length];out.push({input:structuredClone(input),public:false,expected:reference(id,input)});}return out;}
+function randomInput(id){
+ const arr=(n,lo=-20,hi=20)=>Array.from({length:n},()=>ri(lo,hi));
+ const str=n=>Array.from({length:n},()=>String.fromCharCode(97+ri(0,4))).join('');
+ if(id==='two_sum'){const nums=arr(ri(8,60));return {nums,target:ri(0,1)?nums[ri(0,nums.length-1)]+nums[ri(0,nums.length-1)]:99999};}
+ if(id==='parentheses'){const n=ri(2,25),t='()[]{}';let text=Array.from({length:n},()=>t[ri(0,t.length-1)]).join('');if(ri(0,1))text='('.repeat(n)+')'.repeat(n);return {text};}
+ if(id==='bfs'){const n=ri(5,32),edges=[];for(let i=0;i<ri(0,n*2);i++)edges.push([ri(0,n-1),ri(0,n-1)]);return {n,edges,start:ri(0,n-1)};}
+ if(id==='attention'){const a=ri(1,5),b=ri(1,6),d=ri(1,6),v=ri(1,4),mat=(r,c)=>Array.from({length:r},()=>Array.from({length:c},()=>ri(-20,20)/10));return {q:mat(a,d),k:mat(b,d),v:mat(b,v),...(ri(0,1)?{mask:Array.from({length:a},()=>Array.from({length:b},()=>ri(0,1)===1))}:{})};}
+ if(id==='astar'){const n=ri(5,14),grid=Array.from({length:n},()=>Array.from({length:n},()=>ri(0,9)<3?1:0));grid[0][0]=0;grid[n-1][n-1]=0;return {grid,start:[0,0],goal:[n-1,n-1]};}
+ if(id==='binary_search'){const nums=arr(ri(5,70)).sort((a,b)=>a-b);return {nums,target:ri(0,1)?nums[ri(0,nums.length-1)]:ri(-30,30)};}
+ if(id==='dijkstra'){const n=ri(4,20),edges=[];for(let i=0;i<ri(n,3*n);i++)edges.push([ri(0,n-1),ri(0,n-1),ri(0,15)]);return {n,edges,source:ri(0,n-1)};}
+ if(id==='knapsack'){const n=ri(1,14),weights=arr(n,1,12),values=arr(n,0,30);return {weights,values,capacity:ri(0,35)};}
+ if(id==='merge_intervals'){const intervals=Array.from({length:ri(0,20)},()=>{const a=ri(0,40),b=ri(a,50);return [a,b];});return {intervals};}
+ if(id==='top_k'){const nums=arr(ri(5,50),-8,8),u=[...new Set(nums)];return {nums,k:ri(1,u.length)};}
+ if(id==='max_subarray')return {nums:arr(ri(1,60),-50,50)};
+ if(id==='union_find'){const n=ri(3,25),operations=Array.from({length:ri(5,50)},()=>{const a=ri(0,n-1),b=ri(0,n-1);return [ri(0,1)?'union':'connected',a,b];});return {n,operations};}
+ if(id==='lcs')return {a:str(ri(0,24)),b:str(ri(0,24))};
+ if(id==='topological_sort'){const n=ri(4,24),order=Array.from({length:n},(_,i)=>i).sort(()=>Math.random()-.5),edges=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(ri(0,5)===0)edges.push([order[i],order[j]]);return {n,edges};}
+ if(id==='coin_change'){const coins=[...new Set(arr(ri(1,6),1,12))];return {coins,amount:ri(0,50)};}
+ if(id==='lis')return {nums:arr(ri(0,60),-40,40)};
+ if(id==='sliding_window_max'){const nums=arr(ri(1,50));return {nums,k:ri(1,nums.length)};}
+ if(id==='kmp'){const text=str(ri(0,80)),pattern=str(ri(0,8));return {text,pattern};}
+ if(id==='matrix_multiply'){const m=ri(1,5),n=ri(1,5),p=ri(1,5),mat=(a,b)=>Array.from({length:a},()=>Array.from({length:b},()=>ri(-8,8)));return {A:mat(m,n),B:mat(n,p)};}
+ if(id==='interval_scheduling'){const intervals=Array.from({length:ri(0,25)},()=>{const a=ri(0,30),b=ri(a,40);return [a,b];});return {intervals};}
+ if(id==='connected_components'){const n=ri(0,30),edges=[];for(let i=0;i<ri(0,Math.max(1,n*2));i++)if(n)edges.push([ri(0,n-1),ri(0,n-1)]);return {n,edges};}
+ if(id==='edit_distance')return {a:str(ri(0,30)),b:str(ri(0,30))};
+ throw new Error('No random generator for '+id);
+}
+export function suite(id){const base=cases[id];if(!base)throw new Error('No test suite');const out=base.map((input,i)=>({input,public:i<2,expected:reference(id,input)}));for(let i=0;i<12;i++){const input=randomInput(id);out.push({input,public:false,expected:reference(id,input)});}return out;}
 export function matches(id,d,a,e){
  if(id==='two_sum')return Array.isArray(a)&&((e.length===0&&a.length===0)||(a.length===2&&a.every(x=>Number.isInteger(x)&&x>=0&&x<d.nums.length)&&a[0]!==a[1]&&d.nums[a[0]]+d.nums[a[1]]===d.target));
  if(id==='attention')return Array.isArray(a)&&a.length===e.length&&a.every((r,i)=>Array.isArray(r)&&r.length===e[i].length&&r.every((x,j)=>typeof x==='number'&&Number.isFinite(x)&&Math.abs(x-e[i][j])<=1e-5+Math.abs(e[i][j])*1e-5));
