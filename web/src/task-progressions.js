@@ -74,5 +74,15 @@ export const TASK_APPLICATIONS={
   "average_precision": "评价目标检测或检索排序在不同召回位置上的整体精度",
   "paired_mean_difference": "对齐相同场景或查询，比较新旧方法的配对指标变化"
 };
+TASK_PROGRESSIONS.push(
+{id:'arrays-two-pointers',title:'数组与双指针高频题',audience:'面试高频 / 数据处理',tasks:['move_zeroes','rotate_array','container_water','product_except_self','three_sum'],why:'数组整理、空间优化、双指针扫描与组合搜索'},
+{id:'hash-window-strings',title:'哈希、滑动窗口与字符串',audience:'面试高频 / 文本与日志处理',tasks:['valid_anagram','group_anagrams','longest_substring','subarray_sum','longest_palindrome'],why:'字符频次、日志窗口、连续区间统计与文本分析'},
+{id:'stack-patterns',title:'栈与单调栈',audience:'面试高频 / 在线数据流',tasks:['min_stack','daily_temperatures'],why:'维护实时最值、下一个更大元素与单调结构'},
+{id:'linked-lists',title:'链表操作与双指针',audience:'面试高频 / 指针结构',tasks:['reverse_linked_list','merge_two_lists','linked_list_cycle','remove_nth_from_end','reorder_list'],why:'链表维护、合并、环检测与多操作组合'},
+{id:'binary-trees',title:'二叉树递归与遍历',audience:'面试高频 / 层次结构',tasks:['max_depth_tree','invert_tree','level_order_tree','validate_bst','kth_smallest_bst','tree_diameter','lowest_common_ancestor'],why:'树结构查询、遍历、搜索性质与递归信息复用'},
+{id:'grid-graphs',title:'网格搜索与拓扑排序',audience:'面试高频 / 地图与依赖',tasks:['number_of_islands','rotting_oranges','course_schedule'],why:'图连通性、网格传播、依赖关系和环检测'},
+{id:'backtracking',title:'回溯与组合搜索',audience:'面试高频 / 组合优化',tasks:['subsets','permutations','combination_sum','word_search'],why:'枚举组合、约束搜索、状态撤销与剪枝'},
+{id:'binary-search-dp',title:'二分、选择与动态规划',audience:'面试高频 / 优化决策',tasks:['search_rotated','find_min_rotated','kth_largest','merge_sorted_array','climbing_stairs','house_robber','unique_paths','decode_ways','longest_increasing_subsequence'],why:'有序数据检索、选择问题、状态转移与复杂度优化'}
+);
 export const TASK_META=Object.fromEntries(TASK_PROGRESSIONS.flatMap(path=>path.tasks.map((task,index)=>[task,{pathId:path.id,pathTitle:path.title,stage:index+1,stages:path.tasks.length,application:TASK_APPLICATIONS[task]||path.why}])));
 for(const p of TASK_PROGRESSIONS){if(p.tasks.some((id,i)=>!id||p.tasks.indexOf(id)!==i))throw Error('Invalid progression '+p.id);}
