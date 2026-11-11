@@ -1,4 +1,4 @@
-# Research Lab 3.5
+# Research Lab 3.7
 
 Research Lab is a research-learning workspace combining structured teaching, mathematical derivations, selectable practice tasks, code evaluation, ROS 2 integration checks, and versioned Supabase learning records.
 
@@ -24,3 +24,11 @@ Run npm ci, npm test and npm run build from the web directory.
 The regression suite verifies all 96 curriculum IDs have lesson content and equations, all algorithm suites, task mappings, and workspace merge behavior.
 
 Vercel project: research-lab-learning; root directory: web; Node 22; build command: npm test && npm run build; output directory: public.
+
+
+## Course-to-assessment bridge (3.7)
+- Every one of the 26 auto-graded tasks maps to one or more specific prerequisite lessons.
+- A task shows its readiness checklist: (1) the worked-example check is correct, and (2) a guided-practice result and explanation have been submitted for each mapped course.
+- The recommendation is deliberately not a hard gate. Learners may attempt a task early; the page tells them exactly which lesson stage to revisit if they get stuck.
+- Course pages link back to all mapped online assessments, and task pages link to the next missing learning step.
+- Readiness is a learning recommendation, not a verified mastery claim. Guided evidence is learner-submitted; only the isolated runner supplies an automatic code verdict.
