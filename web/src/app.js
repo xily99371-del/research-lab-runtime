@@ -9,6 +9,7 @@ import {LEGACY_LESSON_FORMULAS} from './lesson-formulas.js';
 import {enrichCourses,GUIDES,EXACT_LINKS} from './guided/catalog.js';
 import {renderJourneyHome,renderLearningCourses,renderLearningPractice,focusCourse,humanizeReport} from './guided/learning-ui.js';
 import {richText} from './guided/math.js';
+import {taskReadiness} from './guided/assessment-path.js';
 import 'katex/dist/katex.min.css';
 Object.assign(LESSONS,ADVANCED_LESSONS,REMAINING_LESSONS,ROS_MIDDLEWARE_LESSON);
 for(const [id,l]of Object.entries(LESSONS))l.formula ||= LEGACY_LESSON_FORMULAS[id];
@@ -78,6 +79,11 @@ function navigate(p){page=pages[p]?p:'dashboard';location.hash=page;render();}
 for(const b of document.querySelectorAll('nav button'))b.onclick=()=>navigate(b.dataset.page);
 window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(pages[p]&&p!==page){page=p;render();}});
 function openCourse(id){focusCourse(id);navigate('courses');}
+function openCourseStage(id,stage){
+ focusCourse(id);
+ const old=data.progress[id]||{},learning={...(old.learning||{}),stage,startedAt:(old.learning||{}).startedAt||new Date().toISOString()};
+ data.progress[id]={...old,learning};changed();navigate('courses');
+}
 function openTask(id){selectedTask=id;taskMode='code';taskTrack='全部';taskLevel='全部';taskQuery='';taskLang='全部';navigate('code');}
 function rerenderWithFocus(id){const a=$(id),start=a?.selectionStart,end=a?.selectionEnd;render();const b=$(id);if(b){b.focus();if(start!=null)try{b.setSelectionRange(start,end);}catch{}}}
 function reportView(report){const human=humanizeReport(report),wrap=box('learn-report');wrap.setAttribute('role','status');wrap.append(el('h3',human.title),note(human.message+(report.persisted===false?' 成绩尚未成功入库；请保存本次原始报告。':''),report.pass?'ok':'warn'),el('p',human.help,'muted'));
@@ -97,10 +103,24 @@ function renderCode(root){
  const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept).toLowerCase().includes(taskQuery.toLowerCase()));
  if(!ps.some(p=>p.id===selectedTask))selectedTask=ps[0]?.id;
  const list=box('card task-list'),detail=box('card task-detail');
- for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+p.level+' · '+p.langs.join(' / ')));list.append(b);}
+ for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;const readiness=taskReadiness(p.id,data.progress);b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+p.level+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
  const p=PROBLEMS.find(p=>p.id===selectedTask);if(!p){detail.append(el('p','没有匹配的评测题。这个方向也可能有课程实践任务。'),btn('转到课程实践',()=>{taskMode='project';render();}));root.append(box('task-grid',list,detail));return;}
  if(!p.langs.includes(language))language=p.langs[0];if(taskLang!=='全部'&&p.langs.includes(langKey[taskLang]))language=langKey[taskLang];
  detail.append(el('span',p.track+' · '+p.level,'pill blue'),el('h2',p.title),richText(p.desc),el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','为什么这样做'),richText(p.concept));
+ const readiness=taskReadiness(p.id,data.progress),pathPanel=box('assessment-readiness');
+ pathPanel.append(el('h3','开始自动评测前：你的课程准备度'));
+ pathPanel.append(el('p',readiness.why+'。建议达到：关联课程的例题核对正确，并完成带提示练习、提交实际输出与解释。','muted'));
+ pathPanel.append(box('assessment-path-head',el('strong',readiness.ready?'已达到建议准备程度':'建议先完成课程准备'),el('span',readiness.checksDone+'/'+readiness.checksTotal+' 项准备证据','assessment-state '+(readiness.ready?'ready':''))));
+ for(const item of readiness.items){
+  const course=courses.find(c=>c.id===item.id),row=box('assessment-path-row');
+  row.append(el('strong',course?.title||item.id),el('span',(item.theory?'✓ 例题已核对':'○ 例题待核对')+'　'+(item.practice?'✓ 带提示练习已提交':'○ 带提示练习待提交'),'assessment-checks'));
+  if(!item.complete)row.append(btn(item.theory?'去完成带提示练习':'去核对课程例题',()=>openCourseStage(item.id,item.next)));
+  pathPanel.append(row);
+ }
+ if(readiness.ready)pathPanel.append(note('建议准备已完成，可以开始自动评测。测试失败时，根据错误类型回到对应课程，不必从头重学。','ok'));
+ else pathPanel.append(note('这是一条学习建议，不是强制门槛。你可以提前挑战；若暂时做不出来，先补上方标出的课程步骤。','warn'));
+ pathPanel.append(box('actions',btn(readiness.ready?'准备好了，开始评测':'我想提前挑战这道题',()=>{$('code-editor')?.scrollIntoView({block:'center',behavior:'smooth'});$('code-editor')?.focus();},'primary')));
+ detail.append(pathPanel);
  const related=courses.filter(c=>(EXACT_LINKS[c.id]||[]).includes(p.id));for(const c of related.slice(0,3))detail.append(btn('回到分步课程：'+c.title,()=>openCourse(c.id)));
  const lang=el('select');lang.id='code-language';lang.setAttribute('aria-label','提交代码语言');for(const l of p.langs){const o=el('option',l==='cpp'?'C++17':l==='ros2_python'?'ROS 2 Python':'Python 3');o.value=l;lang.append(o);}lang.value=language;lang.onchange=()=>{language=lang.value;render();};lang.disabled=running;
  const editor=el('textarea');editor.id='code-editor';editor.className='field editor';editor.spellcheck=false;editor.setAttribute('aria-label','代码编辑器');const draft=data.drafts[p.id+'-'+language];editor.value=typeof draft==='string'?draft:starter(language);editor.oninput=()=>{data.drafts[p.id+'-'+language]=editor.value;changed();};editor.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();submitCode();}};
