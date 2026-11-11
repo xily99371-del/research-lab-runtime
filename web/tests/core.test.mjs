@@ -5,7 +5,6 @@ import {reference,matches,suite,ALGORITHMS,ROS} from '../lib/tasks.js';
 import {PROBLEMS} from '../src/problems.js';
 import {enrichCourses} from '../src/guided/catalog.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
-import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {LESSONS} from '../src/lessons.js';
 import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
 import {REMAINING_LESSONS} from '../src/remaining-lessons.js';
