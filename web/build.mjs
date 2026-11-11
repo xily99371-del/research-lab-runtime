@@ -27,7 +27,7 @@ const original=JSON.parse(await fs.readFile('data/courses.json','utf8'));
 assert.ok(original.length===96&&new Set(original.map(c=>c.id)).size===96,'Invalid course IDs');
 const taskIds=[...PROBLEMS,...EXPANDED_PROBLEMS,...HOT_PROBLEMS].map(p=>p.id);
 assert.equal(taskIds.length,100,'Phase-two task bank must contain exactly 100 tasks');
-assert.equal(new Set(taskIds).size,60,'Duplicate task IDs');
+assert.equal(new Set(taskIds).size,100,'Duplicate task IDs');
 assert.equal(ALGORITHMS.length,96,'All algorithm tasks must be registered server-side');
 assert.equal(ROS.length,4,'ROS 2 tasks must remain registered');
 for(const id of taskIds)assert.ok(TASK_PATHS[id],'Missing course readiness map for '+id);
@@ -45,6 +45,6 @@ await fs.writeFile('public/courses.json',JSON.stringify(courses),'utf8');
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
 let commitSha=process.env.VERCEL_GIT_COMMIT_SHA||null;
 if(!commitSha)try{commitSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
-const release={version:'4.2.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,progressivePaths:TASK_PROGRESSIONS.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 60 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
+const release={version:'4.2.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,progressivePaths:TASK_PROGRESSIONS.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 100 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
 await fs.writeFile('public/release.json',JSON.stringify(release),'utf8');
 console.log('Built Research Lab 4.2: 100 tasks including 40 high-frequency interview algorithms, organized into 18 progressive, application-oriented learning paths; legacy records retained.');
