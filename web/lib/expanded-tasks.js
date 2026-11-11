@@ -86,7 +86,7 @@ const baseCases={
  average_precision:[{ranked:['a','x','c'],relevant:['a','c']}],
  paired_mean_difference:[{baseline:[1,0,1,0],method:[1,1,0,1]}]
 };
-function randomInputAdvanced(id){
+export function randomInputAdvanced(id){
  const vec=(n,lo=-3,hi=3)=>Array.from({length:n},()=>ri(lo,hi));
  const pts=(n,dim=3)=>Array.from({length:n},()=>vec(dim));
  switch(id){
