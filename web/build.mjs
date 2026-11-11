@@ -5,6 +5,8 @@ import {build} from 'esbuild';
 import {enrichCourses,GUIDE_LIST} from './src/guided/catalog.js';
 import {PROBLEMS} from './src/problems.js';
 import {EXPANDED_PROBLEMS} from './src/expanded-problems.js';
+import {CORE100_PROBLEMS} from './src/core100-problems.js';
+import {TASK_META} from './src/task-meta.js';
 import {ALGORITHMS,ROS} from './lib/tasks.js';
 import {TASK_PATHS} from './src/guided/assessment-path.js';
 
@@ -23,22 +25,23 @@ if(result.error||result.status!==0)throw result.error||new Error('Regression tes
 const pkg=JSON.parse(await fs.readFile('package.json','utf8'));
 const original=JSON.parse(await fs.readFile('data/courses.json','utf8'));
 assert.ok(original.length===96&&new Set(original.map(c=>c.id)).size===96,'Invalid course IDs');
-const taskIds=[...PROBLEMS,...EXPANDED_PROBLEMS].map(p=>p.id);
-assert.equal(taskIds.length,60,'Phase-one task bank must contain exactly 60 tasks');
-assert.equal(new Set(taskIds).size,60,'Duplicate task IDs');
-assert.equal(ALGORITHMS.length,56,'All algorithm tasks must be registered server-side');
+const taskIds=[...PROBLEMS,...EXPANDED_PROBLEMS,...CORE100_PROBLEMS].map(p=>p.id);
+assert.equal(taskIds.length,100,'The assessment bank must contain exactly 100 tasks');
+assert.equal(new Set(taskIds).size,100,'Duplicate task IDs');
+assert.equal(ALGORITHMS.length,96,'All non-ROS tasks must be registered server-side');
 assert.equal(ROS.length,4,'ROS 2 tasks must remain registered');
 for(const id of taskIds)assert.ok(TASK_PATHS[id],'Missing course readiness map for '+id);
 for(const id of [...ALGORITHMS,...ROS])assert.ok(taskIds.includes(id),'Missing user-facing task metadata for '+id);
 const courses=enrichCourses(original);
 assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must not be identical generic text');
+for(const id of taskIds){assert.ok(TASK_META[id],'Missing progressive tier metadata: '+id);assert.ok(courses.some(c=>(c.taskIds||[]).includes(id)),'Missing course catalogue link: '+id);}
 await fs.mkdir('public',{recursive:true});
-await fs.writeFile('public/index.html',html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,'版本 4.0 · 60道自动评测任务'),'utf8');
+await fs.writeFile('public/index.html',html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,'版本 4.1 · 100道递进式评测任务'),'utf8');
 await fs.copyFile('src/style.css','public/style.css');
 await fs.writeFile('public/courses.json',JSON.stringify(courses),'utf8');
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
 let commitSha=process.env.VERCEL_GIT_COMMIT_SHA||null;
 if(!commitSha)try{commitSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
-const release={version:'4.0.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 60 online tasks mapped to prerequisite lessons; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
+const release={version:'4.1.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:taskIds.length,algorithmTasks:ALGORITHMS.length,rosTasks:ROS.length,assessment:'all 100 tasks have progressive tiers, practical application notes and prerequisite course links; readiness is advisory and early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
 await fs.writeFile('public/release.json',JSON.stringify(release),'utf8');
-console.log('Built Research Lab 4.0: 60 automatic tasks across algorithms, ML, CV, 3D, multimodal and robotics; legacy records retained.');
+console.log('Built Research Lab 4.1: 100 progressive tasks; 60-task high-frequency core algorithm path plus AI/robotics and ROS 2 applied tracks.');
