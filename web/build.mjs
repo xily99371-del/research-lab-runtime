@@ -6,4 +6,4 @@ const courses=JSON.parse(await fs.readFile('data/courses.json','utf8'));
 if(!Array.isArray(courses)||courses.length!==96||new Set(courses.map(x=>x.id)).size!==96) throw new Error('Invalid curriculum integrity');
 await fs.writeFile('public/courses.json',JSON.stringify(courses));
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
-console.log('Built Research Lab 3.3: 96 curriculum units, KaTeX, lesson content and task bank.');
+console.log('Built Research Lab 3.4: 96 curriculum units, KaTeX, lesson content and task bank.');
