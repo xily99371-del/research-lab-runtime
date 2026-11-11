@@ -1,4 +1,4 @@
-# Research Lab 3.7
+# Research Lab 4.0
 
 Research Lab is a research-learning workspace combining structured teaching, mathematical derivations, selectable practice tasks, code evaluation, ROS 2 integration checks, and versioned Supabase learning records.
 
@@ -32,3 +32,11 @@ Vercel project: research-lab-learning; root directory: web; Node 22; build comma
 - The recommendation is deliberately not a hard gate. Learners may attempt a task early; the page tells them exactly which lesson stage to revisit if they get stuck.
 - Course pages link back to all mapped online assessments, and task pages link to the next missing learning step.
 - Readiness is a learning recommendation, not a verified mastery claim. Guided evidence is learner-submitted; only the isolated runner supplies an automatic code verdict.
+
+
+## 自动评测题库 4.0
+- Phase one contains 60 unique tasks: 22 original algorithm tasks + 34 new Python/C++ tasks + 4 ROS 2 Python node tasks.
+- New topics include ML training primitives, CNN/BatchNorm, detection metrics/NMS, camera projection, homography, stereo, point-cloud FPS/KNN/voxel/Chamfer, rigid transforms, 3D IoU, tokenizer/rotary/KV cache/contrastive loss, quaternion, occupancy-grid indexing, scalar Kalman update, trajectory metrics, retrieval metrics and paired experiment analysis.
+- Every task has a server-side reference, public examples, randomized hidden cases, numeric comparison tolerances where appropriate, a course mapping and a readiness checklist.
+- The four ROS 2 tasks remain actual ROS 2 Python node contracts. New robotics geometry helpers are Python/C++ algorithm tasks; they are not mislabeled as additional ROS graph/simulator tasks.
+- The online runner still uses the isolated per-submission sandbox. Open-ended model training, GPU benchmarks and full Nav2 simulation are not claimed as supported by this phase.
