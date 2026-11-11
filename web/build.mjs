@@ -22,12 +22,12 @@ assert.ok(original.length===96&&new Set(original.map(c=>c.id)).size===96,'Invali
 const courses=enrichCourses(original);
 assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must not be identical generic text');
 await fs.mkdir('public',{recursive:true});
-await fs.writeFile('public/index.html',html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,'版本 3.6 · 分阶段学习与证据记录'),'utf8');
+await fs.writeFile('public/index.html',html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,'版本 3.7 · 分阶段学习与证据记录'),'utf8');
 await fs.copyFile('src/style.css','public/style.css');
 await fs.writeFile('public/courses.json',JSON.stringify(courses),'utf8');
 await build({entryPoints:['src/app.js'],bundle:true,outfile:'public/app.js',format:'esm',minify:true,target:'es2022',loader:{'.woff2':'file','.woff':'file','.ttf':'file'},assetNames:'fonts/[name]-[hash]'});
 let commitSha=process.env.VERCEL_GIT_COMMIT_SHA||null;
 if(!commitSha)try{commitSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
-const release={version:'3.6.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:26,assessment:'classroom checks / self-submitted evidence / server verdicts are separate'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
+const release={version:'3.7.0',packageVersion:pkg.version,commitSha,branch:process.env.VERCEL_GIT_COMMIT_REF||null,buildTime:new Date().toISOString(),curriculum:{units:GUIDE_LIST.length,stages:5,onlineTasks:26,assessment:'all 26 online tasks mapped to prerequisite lessons; readiness requires worked check + guided evidence; early challenge remains available'},checks:{utf8:true,readableNavigation:true,functionFiles:true,regressionTests:true,uniquePracticeTasks:true}};
 await fs.writeFile('public/release.json',JSON.stringify(release),'utf8');
-console.log('Built Research Lab 3.6: staged learning for all 96 IDs; legacy records retained.');
+console.log('Built Research Lab 3.7: course-to-assessment readiness for all 26 online tasks; legacy records retained.');
