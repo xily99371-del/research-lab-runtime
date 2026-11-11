@@ -13,13 +13,14 @@ const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.m
 
 test('the full assessment catalogue contains 100 unique tasks in three practical tracks',()=>{
  const all=[...PROBLEMS,...EXPANDED_PROBLEMS,...CORE100_PROBLEMS];
+ const enriched=applyTaskMeta(all);
  assert.equal(CORE100_IDS.length,40);assert.equal(CORE100_PROBLEMS.length,40);
  assert.equal(all.length,100);assert.equal(new Set(all.map(p=>p.id)).size,100);
  assert.equal(ALGORITHMS.length,96);assert.equal(ROS.length,4);
  assert.equal(all.filter(p=>p.langs.includes('ros2_python')).length,4);
- assert.equal(all.filter(p=>p.path==='核心算法').length,60);
- assert.equal(all.filter(p=>p.path==='AI/机器人专题').length,36);
- assert.equal(all.filter(p=>p.path==='ROS 2系统集成').length,4);
+ assert.equal(enriched.filter(p=>p.path==='核心算法').length,60);
+ assert.equal(enriched.filter(p=>p.path==='AI/机器人专题').length,36);
+ assert.equal(enriched.filter(p=>p.path==='ROS 2系统集成').length,4);
 });
 
 test('every core task has a five-tier path, practical application and prerequisite course link',()=>{
