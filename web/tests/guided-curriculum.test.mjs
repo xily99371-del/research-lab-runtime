@@ -115,7 +115,6 @@ test('numerical derivation checkpoints are independently reproducible',()=>{
 });
 
 test('five runnable research experiment packs map to the intended courses and real scripts',()=>{
- const fs=require('node:fs');
  assert.equal(EXPERIMENT_PACKS.length,5);
  for(const pack of EXPERIMENT_PACKS){assert.ok(pack.courses.length>=2);assert.ok(pack.summary.length>30);assert.ok(pack.expected.length>20);assert.ok(pack.scope.length>30);assert.ok(fs.existsSync(new URL('../experiments/'+pack.script,import.meta.url)));}
 });

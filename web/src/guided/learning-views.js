@@ -15,7 +15,7 @@ const group=(cls,...children)=>{const n=e('div',null,cls);n.append(...children.f
 const button=(text,action,cls='')=>{const b=e('button',text,cls);b.type='button';b.onclick=()=>Promise.resolve().then(action).catch(err=>alert(err.message));return b;};
 const callout=(text,cls='')=>richText(text,'div','learn-callout '+cls);
 const title=(text)=>e('h3',text);
-function safeLink(text,url){const a=e('a',text);try{const u=new URL(url);if(!['https:','http:'].includes(u.protocol))return e('span',text);a.href=u.href;}catch{return e('span',text);}a.target='_blank';a.rel='noopener noreferrer';return a;}
+function safeLink(text,url){const a=e('a',text);if(typeof url==='string'&&url.startsWith('/')){a.href=url;return a;}try{const u=new URL(url);if(!['https:','http:'].includes(u.protocol))return e('span',text);a.href=u.href;}catch{return e('span',text);}a.target='_blank';a.rel='noopener noreferrer';return a;}
 function field(label,value='',kind='textarea',id=''){const l=e('label',label,'learn-field'),input=e(kind);input.value=value;input.id=id;if(kind==='input')input.type='text';input.autocomplete='off';l.append(input);return {label:l,input};}
 function details(summary,children,open=false,onOpen){const d=e('details',null,'learn-details');d.open=open;d.append(e('summary',summary),...children);if(onOpen)d.addEventListener('toggle',()=>{if(d.open)onOpen();});return d;}
 function state(ctx,id){return progressFor(ctx.data.progress,id);}
