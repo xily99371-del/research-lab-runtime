@@ -94,6 +94,15 @@ test('derivation lab equations parse and include substantive mathematical notati
   assert.ok(rendered>=2,id+' should contain rendered equations across its derivation');
  }
 });
+
+test('five research domains have deep derivation labs with assumptions, code and falsifiable experiments',()=>{
+ const expectedIds=['u10','u21','u33','u38','u40','u41','u54','u61','u62','u75','u81'];
+ for(const id of expectedIds){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>45);assert.ok(d.steps.length>=4);for(const [title,body] of d.steps){assert.ok(title.length>5);assert.ok(body.length>70);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>70);assert.ok(d.code.length>80);assert.ok(d.pitfalls.length>25);}
+});
+test('new numerical checkpoints match independently calculated values',()=>{
+ const expected={u10:2.4,u21:0.5,u33:4,u38:72,u40:1,u41:0.3,u54:-0.1192,u61:0.3,u62:5,u75:3,u81:1.01};
+ for(const [id,value] of Object.entries(expected))assert.ok(Math.abs(Number(DERIVATION_LABS[id].checkpoint.answer)-value)<1e-8,id);
+});
 test('five high-value courses include full mathematical derivations, assumptions, numerical checks and experiments',()=>{
  for(const id of ['u9','u16','u32','u39','u74']){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>40);assert.ok(d.steps.length>=3);for(const step of d.steps){assert.ok(step[0].length>5);assert.ok(step[1].length>50);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>60);assert.ok(d.code.length>50);assert.ok(d.pitfalls.length>20);}
 });
