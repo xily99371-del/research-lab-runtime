@@ -21,7 +21,7 @@ u32:{title:'相机几何：投影、反投影与误差传播',intro:'每一步�
 {title:'第 5 步｜误差传播',objective:'Z=fb/d 对视差 d 的导数为 -fb/d²。相同像素级视差误差在远距离会引起更大的深度误差。',input:{f:100,baseline:0.2,disparity:5,deltaDisparity:0.5},expected:'Z=4m; first-order |delta Z|≈0.4m',method:'改变距离和视差噪声，画深度误差曲线；区分标定误差与匹配误差。',tasks:['stereo_depth']}
 ]},
 u39:{title:'点云几何：邻域、采样与距离度量',intro:'把点云当作无序点集。每次操作都检查点顺序、重复点、密度变化和坐标尺度，不用单一可视化代替几何指标。',steps:[
-{title:'第 1 步｜质心与平移性质',objective:'质心 μ=(1/N)Σp_i。所有点平移 t 后，质心也应平移 t；点顺序不应影响结果。',input:{points:[[0,0,0],[2,0,0],[0,2,0]]},expected:[0.6666666667,0.6666666667,0],method:'增加随机置换和整体平移测试。',tasks:['point_centroid']},
+{title:'第 1 步｜质心与平移性质',objective:'质心 μ=(1/N)Σp_i。所有点平移 t 后，质心也应平移 t；点顺序不应影响结果。',input:{points:[[0,0,0],[2,0,0],[0,2,0]]},expected:[0.6666666667,0.6666666667,0],method:'随机打乱点顺序并整体平移所有点，检查质心是否只随平移向量变化。',tasks:['point_centroid']},
 {title:'第 2 步｜KNN 邻域',objective:'按平方欧氏距离排序，返回最近 k 个点的索引；同距离时用原始索引稳定打破平局。',input:{points:[[0,0,0],[1,0,0],[-1,0,0],[3,0,0]],query:[0,0,0],k:2},expected:[0,1],method:'先检查距离数组，再检查排序索引；注意平方距离不改变近邻次序。',tasks:['knn_points']},
 {title:'第 3 步｜体素量化与局部质心',objective:'体素索引 v=floor(p/s)。负坐标必须使用 floor 而非向零截断。',input:{points:[[-0.1,0,0],[0.1,0,0],[1.1,0,0]],voxel_size:1},expected:[[-0.1,0,0],[0.1,0,0],[1.1,0,0]],method:'比较不同 voxel_size；输出顺序按体素坐标固定，质心保留原坐标。',tasks:['voxel_downsample']},
 {title:'第 4 步｜Farthest Point Sampling',objective:'每轮选择到已选集合最小距离最大的点，近似最大化采样覆盖半径。',input:{points:[[0,0,0],[1,0,0],[3,0,0],[6,0,0]],k:2,start:0},expected:[0,3],method:'维护每个点到已选集合的最小平方距离，避免每轮重算全部两两距离。',tasks:['fps']},
