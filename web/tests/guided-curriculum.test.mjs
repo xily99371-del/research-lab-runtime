@@ -114,6 +114,13 @@ test('numerical derivation checkpoints are independently reproducible',()=>{
  for(const [id,value] of Object.entries(expected))assert.equal(Number(DERIVATION_LABS[id].checkpoint.answer),value,id);
 });
 
+test('course explanation illustrations map to the intended research courses and include Chinese captions',()=>{
+ const fs=await import('node:fs');
+ const source=fs.readFileSync(new URL('../src/guided/learning-views.js',import.meta.url),'utf8');
+ assert.match(source,/function renderCourseIllustration/);
+ for(const name of ['bayes-optimization','multiview-geometry','pointcloud-icp','slam-factor-graph','transformer-attention'])assert.ok(fs.existsSync(new URL('../public/illustrations/'+name+'.svg',import.meta.url)));
+ assert.match(source,/先验与观测共同形成后验/);assert.match(source,/极约束用于检查匹配/);assert.match(source,/点云配准由对应关系/);
+});
 test('five runnable research experiment packs map to the intended courses and real scripts',()=>{
  assert.equal(EXPERIMENT_PACKS.length,5);
  for(const pack of EXPERIMENT_PACKS){assert.ok(pack.courses.length>=2);assert.ok(pack.summary.length>30);assert.ok(pack.expected.length>20);assert.ok(pack.scope.length>30);assert.ok(fs.existsSync(new URL('../experiments/'+pack.script,import.meta.url)));}

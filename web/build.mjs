@@ -53,6 +53,11 @@ assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must no
 await fs.mkdir('public',{recursive:true});
 await fs.rm('public/experiments',{recursive:true,force:true});
 await fs.cp('experiments','public/experiments',{recursive:true});
+await fs.access('public/illustrations/bayes-optimization.svg');
+await fs.access('public/illustrations/multiview-geometry.svg');
+await fs.access('public/illustrations/pointcloud-icp.svg');
+await fs.access('public/illustrations/slam-factor-graph.svg');
+await fs.access('public/illustrations/transformer-attention.svg');
 const displayVersion=pkg.version.split('.').slice(0,2).join('.');
 const releaseLabel=`版本 ${displayVersion} · ${taskIds.length}道自动评测任务 · 分阶段学习与证据记录`;
 const publicHtml=html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,releaseLabel);

@@ -80,6 +80,29 @@ function lessonIntro(ctx,c,g,p){
  out.append(callout('先过小例子，再做实现：本节不要求第一次就完成论文级实验。研究延伸留在第五阶段。','ok'));
  out.append(group('actions',button('进入讲解与例题',()=>setStage(ctx,c.id,1),'primary'),button('先浏览独立实现要求',()=>setStage(ctx,c.id,3)),button('加入周计划',()=>plan(ctx,c.id,0))));return out;
 }
+const COURSE_ILLUSTRATIONS={
+ u10:{src:'/illustrations/bayes-optimization.svg',alt:'先验、观测数据、后验和梯度下降之间的关系',caption:'先验与观测共同形成后验；优化算法进一步寻找使目标函数最小的参数。'},
+ u16:{src:'/illustrations/bayes-optimization.svg',alt:'损失函数与梯度下降收敛示意',caption:'从经验风险出发，通过梯度更新求解参数；注意区分损失、梯度和学习率。'},
+ u21:{src:'/illustrations/bayes-optimization.svg',alt:'梯度下降沿损失曲线向极小值移动',caption:'曲率决定不同方向的更新尺度，学习率过大可能引起振荡或发散。'},
+ u32:{src:'/illustrations/multiview-geometry.svg',alt:'双相机观察空间点、极线约束和三角化',caption:'两视图几何将像素匹配转化为极约束，再通过三角化估计空间点。'},
+ u33:{src:'/illustrations/multiview-geometry.svg',alt:'双目极几何与三角化流程',caption:'极约束用于检查匹配的几何一致性；深度精度还取决于视差和像素噪声。'},
+ u38:{src:'/illustrations/multiview-geometry.svg',alt:'多视图匹配与三角化的几何关系',caption:'鲁棒几何验证先筛除不一致匹配，再将可信对应送入三角化。'},
+ u39:{src:'/illustrations/pointcloud-icp.svg',alt:'源点云与目标点云通过对应和刚体变换进行配准',caption:'点云配准由对应关系、刚体变换估计和迭代优化组成；离群点会影响每一步。'},
+ u40:{src:'/illustrations/pointcloud-icp.svg',alt:'Kabsch 与 SVD 估计点云刚体变换',caption:'Kabsch 通过中心化和 SVD 求旋转，再由质心对齐恢复平移。'},
+ u41:{src:'/illustrations/pointcloud-icp.svg',alt:'ICP 对应关系与迭代残差变化',caption:'局部几何约束决定优化可观测性；残差下降并不自动意味着所有自由度都被约束。'},
+ u74:{src:'/illustrations/slam-factor-graph.svg',alt:'里程计轨迹、回环约束与因子图优化',caption:'状态估计通过先验和观测更新不确定性；回环约束可帮助抑制累计漂移。'},
+ u75:{src:'/illustrations/slam-factor-graph.svg',alt:'SLAM 位姿节点、因子节点和回环约束',caption:'因子图将位姿变量与局部观测连接起来；固定参考位姿用于消除全局坐标自由度。'},
+ u81:{src:'/illustrations/slam-factor-graph.svg',alt:'SLAM 轨迹和回环约束示意',caption:'IMU 预积分为关键帧间提供相对运动约束，并与视觉因子共同优化。'},
+ u54:{src:'/illustrations/transformer-attention.svg',alt:'QKV 注意力、在线 Softmax 与图文对齐',caption:'注意力聚合序列信息，CLIP 对齐图文表示，在线 Softmax 则减少中间矩阵读写。'},
+ u61:{src:'/illustrations/transformer-attention.svg',alt:'Transformer 位置编码与注意力结构示意',caption:'位置编码影响 Query 与 Key 的关系；相对位置性质不等于无限长度外推保证。'},
+ u62:{src:'/illustrations/transformer-attention.svg',alt:'标准注意力与分块在线 Softmax 流程',caption:'FlashAttention 优化数据搬运和中间存储，不会消除标准精确注意力的二次算术项。'}
+};
+function renderCourseIllustration(out,id){
+ const item=COURSE_ILLUSTRATIONS[id];if(!item)return;
+ const figure=group('learn-illustration');
+ const image=e('img');image.src=item.src;image.alt=item.alt;image.loading='lazy';image.decoding='async';
+ figure.append(image,e('p',item.caption,'learn-illustration-caption'));out.append(figure);
+}
 function renderSourceMap(out,id){const map=RESEARCH_SOURCE_MAP[id];if(!map)return;out.append(title('论文—源码对照 · '+map.title));for(const paper of map.papers){const card=group('learn-reference-card');card.append(e('h4',paper.title),e('p',paper.authors+' · '+paper.venue,'muted'),richText('核心主张：'+paper.claim),richText('建议追踪：'+paper.focus),safeLink('阅读论文 / 官方文档',paper.paper));if(paper.code?.length){const links=group('learn-source-links');for(const [label,url] of paper.code)links.append(safeLink(label,url));card.append(links);}out.append(card);}}
 function renderExperimentPacks(out,id){const packs=EXPERIMENT_PACKS.filter(x=>x.courses.includes(id));if(!packs.length)return;out.append(title('可运行研究实验包'));for(const pack of packs){const card=group('learn-reference-card');card.append(e('h4',pack.title),richText(pack.summary),richText('预期检查：'+pack.expected),callout('实验边界：'+pack.scope,'neutral'));const a=e('a','下载 Python 实验脚本');a.href='/experiments/'+pack.script;a.download=pack.script;card.append(a,safeLink('查看实验包说明与环境配置','/experiments/README.md'));out.append(card);}}
 function lessonExplain(ctx,c,g,p){
@@ -94,6 +117,7 @@ function lessonExplain(ctx,c,g,p){
  if(lesson?.formula)out.append(richText(lesson.formula,'div','learn-equation'));
  if(lesson){for(const [i,s]of lesson.sections.entries()){out.append(details(s[0],[richText(s[1])],i===0));}}
  const derivation=DERIVATION_LABS[c.id];if(derivation){out.append(title('数学推导实验室'),callout(derivation.purpose,'neutral'),callout('适用假设：'+derivation.assumptions,'neutral'));for(const [i,step]of derivation.steps.entries())out.append(details(step[0],[richText(step[1],'div','learn-prose')],i===0));out.append(checkWidget(ctx,c.id,'derivation-check',derivation.checkpoint.question,derivation.checkpoint.answer,derivation.checkpoint.insight));out.append(details('把推导变成可验证实验',[richText(derivation.experiment),richText('代码任务：'+derivation.code),callout('常见误区：'+derivation.pitfalls,'warn')],false));}
+ renderCourseIllustration(out,c.id);
  renderSourceMap(out,c.id);
  out.append(title('理解检查：先口头解释，再写下依据'));
  const qs=lesson?.questions||[];qs.forEach((q,i)=>out.append(richText((i+1)+'. '+q,'p')));
