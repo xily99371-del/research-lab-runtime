@@ -6,6 +6,7 @@ import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
 import {ALGORITHMS,ROS,publicSuite} from '../lib/tasks.js';
+import {COMPLEXITY_GUIDES} from '../src/task-complexity.js';
 import {stageUnlockReason} from '../src/guided/model.js';
 
 test('every automatic task has an explicit course path',()=>{
@@ -60,4 +61,8 @@ test('sample endpoint serves only structured public examples and rejects unsuppo
 
 test('course stages unlock only after required learning evidence',()=>{
  const p={};assert.ok(stageUnlockReason(p,'u16',2));p.u16={learning:{checks:{worked:{passed:true}}}};assert.equal(stageUnlockReason(p,'u16',2),null);assert.ok(stageUnlockReason(p,'u16',3));p.u16.learning.evidence={guided:{submittedAt:'x'}};assert.equal(stageUnlockReason(p,'u16',3),null);assert.ok(stageUnlockReason(p,'u16',4));p.u16.learning.evidence.independent={submittedAt:'y'};assert.equal(stageUnlockReason(p,'u16',4),null);
+});
+
+test('representative complexity guides have explicit time, space and rationale',()=>{
+ for(const id of ['two_sum','bfs','dijkstra','attention','linear_regression_step','project_point','fps','chamfer_distance','contrastive_loss']){const g=COMPLEXITY_GUIDES[id];assert.ok(g,id);assert.match(g.time,/O\\(/);assert.match(g.space,/O\\(/);assert.ok(g.why.length>15);}
 });
