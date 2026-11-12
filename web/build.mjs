@@ -18,6 +18,7 @@ assert.doesNotMatch(html,/\uFFFD/,'Replacement characters found in HTML');
 for(const label of ['学习驾驶舱','课程与讲解','任务中心 / 在线评测','研究与实验','论文笔记','周计划','导师联系','账户与数据'])assert.ok(html.includes(label),'Missing readable navigation: '+label);
 const config=JSON.parse(await fs.readFile('vercel.json','utf8'));
 for(const name of Object.keys(config.functions||{}))if(!name.includes('*'))await fs.access(name);
+await fs.access('api/samples.js');
 const tests=(await fs.readdir('tests')).filter(n=>n.endsWith('.test.mjs')).sort().map(n=>'tests/'+n);
 assert.ok(tests.length,'A release must include regression tests');
 const result=spawnSync(process.execPath,['--test',...tests],{stdio:'inherit'});
