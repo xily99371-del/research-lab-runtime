@@ -14,6 +14,7 @@ import {enrichCourses,GUIDES,EXACT_LINKS} from './guided/catalog.js';
 import {renderJourneyHome,renderLearningCourses,renderLearningPractice,focusCourse,humanizeReport} from './guided/learning-ui.js';
 import {richText} from './guided/math.js';
 import {taskReadiness,TASK_PATHS} from './guided/assessment-path.js';
+import {stageUnlockReason} from './guided/model.js';
 import 'katex/dist/katex.min.css';
 Object.assign(LESSONS,ADVANCED_LESSONS,REMAINING_LESSONS,ROS_MIDDLEWARE_LESSON);
 for(const [id,l]of Object.entries(LESSONS))l.formula ||= LEGACY_LESSON_FORMULAS[id];
@@ -85,6 +86,7 @@ window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(page
 function openCourse(id){focusCourse(id);navigate('courses');}
 function openCourseStage(id,stage){
  focusCourse(id);
+ const reason=stageUnlockReason(data.progress,id,stage);if(reason){notify(reason);stage=stage<=2?1:stage===3?2:3;}
  const old=data.progress[id]||{},learning={...(old.learning||{}),stage,startedAt:(old.learning||{}).startedAt||new Date().toISOString()};
  data.progress[id]={...old,learning};changed();navigate('courses');
 }

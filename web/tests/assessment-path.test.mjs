@@ -6,6 +6,7 @@ import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
 import {ALGORITHMS,ROS,publicSuite} from '../lib/tasks.js';
+import {stageUnlockReason} from '../src/guided/model.js';
 
 test('every automatic task has an explicit course path',()=>{
  assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length+HOT_PROBLEMS.length);
@@ -55,4 +56,8 @@ test('sample endpoint serves only structured public examples and rejects unsuppo
  for(const sample of ok.body.samples)assert.deepEqual(Object.keys(sample).sort(),['expected','input','name']);
  const ros=makeRes();await handler({method:'GET',query:{task_id:'ros_topic'}},ros);assert.equal(ros.statusCode,404);
  const method=makeRes();await handler({method:'POST',query:{task_id:'two_sum'}},method);assert.equal(method.statusCode,405);
+});
+
+test('course stages unlock only after required learning evidence',()=>{
+ const p={};assert.ok(stageUnlockReason(p,'u16',2));p.u16={learning:{checks:{worked:{passed:true}}}};assert.equal(stageUnlockReason(p,'u16',2),null);assert.ok(stageUnlockReason(p,'u16',3));p.u16.learning.evidence={guided:{submittedAt:'x'}};assert.equal(stageUnlockReason(p,'u16',3),null);assert.ok(stageUnlockReason(p,'u16',4));p.u16.learning.evidence.independent={submittedAt:'y'};assert.equal(stageUnlockReason(p,'u16',4),null);
 });

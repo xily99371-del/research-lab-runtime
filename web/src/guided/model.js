@@ -17,6 +17,7 @@ export function checkAnswer(given, expected) {
   return numeric.test(a)&&numeric.test(b)&&Math.abs(Number(a)-Number(b))<=1e-6*Math.max(1,Math.abs(Number(b)));
 }
 export function progressFor(progress,id){return progress[id]?.learning||{};}
+export function stageUnlockReason(progress,id,target){const p=progressFor(progress,id);if(target<=1)return null;if(!p.checks?.worked?.passed)return '先在讲解阶段独立核对正确例题，才能进入带提示练习。';if(target>=3&&!p.evidence?.guided?.submittedAt)return '先提交带提示练习的实际输出与解释，才能进入独立实现。';if(target>=4&&!p.evidence?.independent?.submittedAt)return '先提交独立实现代码、测试结果和原理说明，才能进入科研迁移与面试训练。';return null;}
 export function learnerStatus(progress,id,jobs=[],taskIds=[]) {
  const p=progressFor(progress,id),serverPassed=jobs.some(j=>j.status==='passed'&&taskIds.includes(j.task_id));
  return {started:!!(p.stage||p.checks||p.evidence),checked:!!p.checks?.worked?.passed,

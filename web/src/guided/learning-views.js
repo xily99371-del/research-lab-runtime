@@ -1,5 +1,5 @@
 import {GUIDES,EXACT_LINKS,enrichCourses} from './catalog.js';
-import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit} from './model.js';
+import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit,stageUnlockReason} from './model.js';
 import {richText} from './math.js';
 import {taskReadiness,TASK_PATHS} from './assessment-path.js';
 import './learning.css';
@@ -19,9 +19,9 @@ function state(ctx,id){return progressFor(ctx.data.progress,id);}
 function edit(ctx,id,fn){const old=ctx.data.progress[id]||{},p=structuredClone(old.learning||{});fn(p);p.updatedAt=new Date().toISOString();ctx.data.progress[id]={...old,learning:p};ctx.changed();}
 function preserveFocus(ctx){const a=document.activeElement,id=a?.id,start=a?.selectionStart,end=a?.selectionEnd;ctx.refresh();if(id){const b=document.getElementById(id);if(b){b.focus();if(typeof b.setSelectionRange==='function'&&start!==null)try{b.setSelectionRange(start,end);}catch{}}}}
 export function focusCourse(id,reset=true){ui.course=id;if(reset){ui.query='';ui.track='全部';}}
-function open(ctx,id,stage){focusCourse(id);if(stage!==undefined)edit(ctx,id,p=>{p.stage=stage;p.startedAt||=new Date().toISOString();});ctx.navigate('courses');}
+function open(ctx,id,stage){focusCourse(id);if(stage!==undefined){const reason=stageUnlockReason(ctx.data.progress,id,stage);if(reason){ctx.notify(reason);stage=stage<=2?1:stage===3?2:3;}edit(ctx,id,p=>{p.stage=stage;p.startedAt||=new Date().toISOString();});}ctx.navigate('courses');}
 function getCourse(ctx,id){return ctx.courses.find(c=>c.id===id);}
-function setStage(ctx,id,n){edit(ctx,id,p=>{p.stage=n;p.startedAt||=new Date().toISOString();});ctx.refresh();document.querySelector('.learn-main')?.scrollIntoView({block:'start',behavior:'smooth'});}
+function setStage(ctx,id,n){const reason=stageUnlockReason(ctx.data.progress,id,n);if(reason){ctx.notify(reason);return;}edit(ctx,id,p=>{p.stage=n;p.startedAt||=new Date().toISOString();});ctx.refresh();document.querySelector('.learn-main')?.scrollIntoView({block:'start',behavior:'smooth'});}
 function plan(ctx,id,stage=2){const c=getCourse(ctx,id),key=id+':'+stage;const exists=ctx.data.weeks.find(w=>w.learningKey===key&&!w.done);if(exists){ctx.notify('本周已有这项任务');return;}ctx.data.weeks.unshift({id:crypto.randomUUID(),title:c.title+'｜'+STAGES[stage],hours:1,done:false,learningKey:key,courseId:id,stage,created_at:new Date().toISOString()});ctx.changed();ctx.notify('已加入周计划；计划时长可在周计划中调整');}
 function checkWidget(ctx,courseId,key,question,answer,explanation,remedialId){
  const p=state(ctx,courseId),old=p.checks?.[key]||{},wrap=group('learn-check');wrap.dataset.check=key;
@@ -161,7 +161,7 @@ export function renderLearningCourses(root,ctx){
  const g=GUIDES[c.id],p=state(ctx,c.id),stage=Math.min(4,Math.max(0,Number(p.stage)||0));
  main.append(e('span',c.track,'pill blue'),e('h2',c.title),richText(g.goal,'p','learn-goal'));
  const tabs=group('learn-stages');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','学习阶段');
- STAGES.forEach((label,i)=>{const b=button((i+1)+'. '+label,()=>setStage(ctx,c.id,i),i===stage?'active':'');b.setAttribute('role','tab');b.setAttribute('aria-selected',String(i===stage));b.dataset.stage=String(i);tabs.append(b);});main.append(tabs);
+ STAGES.forEach((label,i)=>{const reason=stageUnlockReason(ctx.data.progress,c.id,i),b=button((reason?'🔒 ':'')+(i+1)+'. '+label,()=>setStage(ctx,c.id,i),i===stage?'active':'');b.setAttribute('role','tab');b.setAttribute('aria-selected',String(i===stage));b.dataset.stage=String(i);if(reason)b.title=reason;tabs.append(b);});main.append(tabs);
  const legacy=ctx.data.progress[c.id]||{};if(legacy.theory||legacy.implementation||legacy.research)main.append(details('查看旧版自评（不自动折算为新阶段通过）',[e('p','原理论/实现/研究勾选与旧笔记仍保留；新的课堂核对和证据记录从这里单独积累。')]));
  main.append([lessonIntro,lessonExplain,lessonPractice,lessonIndependent,lessonTransfer][stage](ctx,c,g,p));
  root.append(group('course-grid learn-layout',list,main));
