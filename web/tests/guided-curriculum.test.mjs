@@ -15,6 +15,7 @@ import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {PRACTICE_LADDERS} from '../src/guided/practice-ladders.js';
 import {INTERVIEW_BANK} from '../src/guided/interview-bank.js';
+import {DERIVATION_LABS} from '../src/guided/derivation-labs.js';
 import {TASK_PATHS} from '../src/guided/assessment-path.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
@@ -85,4 +86,12 @@ test('oral defense bank covers core research internship topics with follow-up ch
 test('all four research routes include a scoped capstone and measurable acceptance criteria',()=>{for(const route of ROUTES){assert.ok(route.capstone,route.id);assert.ok(route.capstone.brief.length>30);assert.ok(route.capstone.evidence.length>20);assert.ok(route.capstone.acceptance.length>20);}});
 test('every course has a research oral-examination entry or a tailored fallback',()=>{
  for(const g of GUIDE_LIST){const bank=INTERVIEW_BANK[g.id];if(bank){assert.ok(bank.questions.length>=1);for(const q of bank.questions)assert.ok(q.followups.length>=3);}else{assert.ok(g.worked.question.length>10);assert.ok(g.boundary.length>10);assert.ok(g.transfer.length>10);}}
+});
+
+test('five high-value courses include full mathematical derivations, assumptions, numerical checks and experiments',()=>{
+ for(const id of ['u9','u16','u32','u39','u74']){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>40);assert.ok(d.steps.length>=3);for(const step of d.steps){assert.ok(step[0].length>5);assert.ok(step[1].length>100);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>80);assert.ok(d.code.length>50);assert.ok(d.pitfalls.length>20);}
+});
+test('numerical derivation checkpoints are independently reproducible',()=>{
+ const expected={u9:10000,u16:-5,u32:0.5,u39:2,u74:0.8};
+ for(const [id,value] of Object.entries(expected))assert.equal(Number(DERIVATION_LABS[id].checkpoint.answer),value,id);
 });

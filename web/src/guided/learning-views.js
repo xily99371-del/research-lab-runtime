@@ -5,6 +5,7 @@ import {taskReadiness,TASK_PATHS} from './assessment-path.js';
 import './learning.css';
 import {PRACTICE_LADDERS} from './practice-ladders.js';
 import {INTERVIEW_BANK} from './interview-bank.js';
+import {DERIVATION_LABS} from './derivation-labs.js';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
 const e=(tag,text='',cls='')=>{const n=document.createElement(tag);if(text!==null)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -88,6 +89,7 @@ function lessonExplain(ctx,c,g,p){
  out.append(title('原理、数学推导与源码视角'),e('p','先读与你当前问题有关的段落，再展开推导；正文中的数学表达与公式区都参与渲染。','muted'));
  if(lesson?.formula)out.append(richText(lesson.formula,'div','learn-equation'));
  if(lesson){for(const [i,s]of lesson.sections.entries()){out.append(details(s[0],[richText(s[1])],i===0));}}
+ const derivation=DERIVATION_LABS[c.id];if(derivation){out.append(title('数学推导实验室'),callout(derivation.purpose,'neutral'),callout('适用假设：'+derivation.assumptions,'neutral'));for(const [i,step]of derivation.steps.entries())out.append(details(step[0],[richText(step[1],'div','learn-prose')],i===0));out.append(checkWidget(ctx,c.id,'derivation-check',derivation.checkpoint.question,derivation.checkpoint.answer,derivation.checkpoint.insight));out.append(details('把推导变成可验证实验',[richText(derivation.experiment),richText('代码任务：'+derivation.code),callout('常见误区：'+derivation.pitfalls,'warn')],false));}
  out.append(title('理解检查：先口头解释，再写下依据'));
  const qs=lesson?.questions||[];qs.forEach((q,i)=>out.append(richText((i+1)+'. '+q,'p')));
  out.append(title('原始资料'),...(lesson?.links||[]).map(([name,url])=>group('learn-reference',safeLink(name,url))));

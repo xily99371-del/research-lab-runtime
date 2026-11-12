@@ -20,6 +20,7 @@ const config=JSON.parse(await fs.readFile('vercel.json','utf8'));
 for(const name of Object.keys(config.functions||{}))if(!name.includes('*'))await fs.access(name);
 await fs.access('api/samples.js');
 await fs.access('src/guided/interview-bank.js');
+await fs.access('src/guided/derivation-labs.js');
 await fs.access('src/task-complexity.js');
 const tests=(await fs.readdir('tests')).filter(n=>n.endsWith('.test.mjs')).sort().map(n=>'tests/'+n);
 assert.ok(tests.length,'A release must include regression tests');
