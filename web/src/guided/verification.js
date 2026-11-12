@@ -1,7 +1,7 @@
 export const VERIFICATION={
 u31:[
 {label:'常量输入',purpose:'差分核在常量区域应为零，检查符号与边界处理。',code:'assert correlate_valid([3,3,3,3], [1,0,-1]) == [0,0]'},
-{label:'线性斜坡',purpose:'斜坡响应应保持符号一致，核翻转后结果反号。',code:'assert correlate_valid([1,2,3,4], [1,0,-1]) == [-2,-2]\nassert correlate_valid([1,2,3,4], [-1,0,1]) == [2,2]'}
+{label:'线性斜坡',purpose:'斜坡响应应保持符号一致，核翻转后结果反号。',code:'assert correlate_valid([1,2,4], [1,0,-1]) == [-3]\nassert correlate_valid([1,2,4], [-1,0,1]) == [3]'}
 ],
 u32:[
 {label:'已知点投影',purpose:'单位外参下验证焦距、深度和主点的组合。',code:'import numpy as np\nK = np.array([[100.,0,50],[0,100,40],[0,0,1]])\nR = np.eye(3)\nt = np.zeros(3)\nassert np.allclose(project_point(K,R,t,[2,0,4]), [100,40])'},
@@ -46,7 +46,7 @@ u53:[
 u71:[
 {label:'Topic 端点核查',purpose:'先确认节点、话题、类型与 QoS，再检查实际消息。',language:'bash',code:'ros2 node list\nros2 topic list -t\nros2 topic info /training/input --verbose\nros2 topic echo /training/output'},
 {label:'QoS 不兼容复现',purpose:'分别运行 RELIABLE 与 BEST_EFFORT 端点，观察匹配状态；话题可见不代表端点兼容。',language:'bash',code:'ros2 topic info /camera/image --verbose\nros2 doctor --report'},
-{label:'独立观察者验收',purpose:'发布端和订阅端分开启动，验证真实输出、消息频率和超时。',language:'bash',code:'ros2 run demo_nodes_py talker\nros2 run demo_nodes_py listener\nros2 topic hz /chatter'}
+{label:'独立观察者验收',purpose:'发布端和订阅端分开启动，验证真实输出、消息频率和超时。',language:'bash',code:'# Terminal A: run the course node\nros2 run <your_package> <your_node>\n# Terminal B: inspect its output\nros2 topic info /training/output --verbose\nros2 topic echo /training/output\nros2 topic hz /training/output'}
 ],
 u72:[
 {label:'变换与逆变换',purpose:'已知点经旋转和平移后，再做逆变换应恢复原点。',code:'import numpy as np\nR=np.array([[0.,-1,0],[1,0,0],[0,0,1]])\nt=np.array([1.,2.,0]); p=np.array([1.,0,0])\nq=transform_point(R,t,p)\nassert np.allclose(q,[1,3,0])\nassert np.allclose(inverse_transform(R,t,q),p)'},
