@@ -64,5 +64,5 @@ test('course stages unlock only after required learning evidence',()=>{
 });
 
 test('representative complexity guides have explicit time, space and rationale',()=>{
- for(const id of ['two_sum','bfs','dijkstra','attention','linear_regression_step','project_point','fps','chamfer_distance','contrastive_loss']){const g=COMPLEXITY_GUIDES[id];assert.ok(g,id);assert.match(g.time,/O\\(/);assert.match(g.space,/O\\(/);assert.ok(g.why.length>15);}
+ for(const id of ['two_sum','bfs','dijkstra','attention','linear_regression_step','project_point','fps','chamfer_distance','contrastive_loss']){const g=COMPLEXITY_GUIDES[id];assert.ok(g,id);assert.ok(g.time.includes('O('));assert.ok(g.space.includes('O('));assert.ok(g.why.length>15);}
 });
