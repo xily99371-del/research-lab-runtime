@@ -10,9 +10,9 @@ export const DERIVATION_LABS={
 \nabla f(x)=A^T(Ax-b)。
 
 驻点满足 A^TAx=A^Tb。这个推导只说明精确算术下的最优性条件，不说明数值计算中应该显式求解 A^TA。`],
-   ['2. 条件数为何平方',m`A^TA 的特征值是 A 的奇异值平方：\lambda_i(A^TA)=\sigma_i(A)^2。
+   ['2. 条件数为何平方',m`A^TA 的特征值是 A 的奇异值平方：\\(\lambda_i(A^TA)=\sigma_i(A)^2\\)。
 
-因此在二范数下 \kappa_2(A^TA)=\frac{\sigma_{max}^2}{\sigma_{min}^2}=\kappa_2(A)^2。
+因此在二范数下 \\(\kappa_2(A^TA)=\frac{\sigma_{max}^2}{\sigma_{min}^2}=\kappa_2(A)^2\\)。
 
 A 的方向尺度相差 10^2 时，正规方程会把尺度差放大到 10^4。`],
    ['3. 问题敏感性与算法稳定性',m`条件数描述输入扰动对精确解的敏感性；后向稳定性描述算法结果是否等价于对邻近输入求精确解。高条件数问题即使使用稳定算法也可能有较大前向误差；低条件数问题也可能被不稳定算法算坏。
@@ -61,7 +61,7 @@ L(\theta)=\frac{1}{2n}\|X\theta-y\|_2^2+\frac{\lambda}{2}\|\theta\|_2^2。
    ['1. 投影函数',m`u=f_x\frac XZ+c_x，\quad v=f_y\frac YZ+c_y。
 
 深度 Z 同时出现在两个分母中，因此远近变化会改变同一横向位移对应的像素位移。`],
-   ['2. 对三维点求雅可比',m`J=\frac{\partial(u,v)}{\partial(X,Y,Z)}=\begin{bmatrix}\frac{f_x}{Z}&0&-\frac{f_xX}{Z^2}\\0&\frac{f_y}{Z}&-\frac{f_yY}{Z^2}\end{bmatrix}。
+   ['2. 对三维点求雅可比',m`\\(J=\frac{\partial(u,v)}{\partial(X,Y,Z)}=\begin{bmatrix}\frac{f_x}{Z}&0&-\frac{f_xX}{Z^2}\\0&\frac{f_y}{Z}&-\frac{f_yY}{Z^2}\end{bmatrix}\\)。
 
 第一列表示 X 方向扰动对像素的影响；第三列说明深度误差会与离轴位置耦合，主点附近 X、Y 较小时影响较弱。`],
    ['3. 不确定性传播',m`若三维点协方差为 \Sigma_{XYZ}，一阶近似下像素协方差为 \Sigma_{uv}\approx J\Sigma_{XYZ}J^T。
@@ -90,10 +90,10 @@ max 聚合对点数变化较稳健，但会丢失点间局部关系；局部图/
 因此应结合 F-score、Hausdorff、法向一致性或任务相关边界误差，并按点密度和场景类别分层报告。`],
    ['4. 梯度与最近邻切换',m`在最近邻对应关系固定的局部区域内，平方距离对点坐标可微；当最近邻发生切换时，目标函数分段光滑，梯度可能不连续。训练时要关注采样、离群点和对应关系抖动，而不只观察总 loss。`]
   ],
-  checkpoint:{question:'A={(0,0),(2,0)}，B={(0,0),(3,0)}。按双向平方 Chamfer 和式，CD(A,B) 是多少？',answer:'1',insight:'A→B 最近邻平方距离和为1；B→A 最近邻平方距离和也为1？这里按点集双向和：A 中点(2,0)到(3,0)为1，B中点(3,0)到(2,0)为1，因此总和为2。'},
+  checkpoint:{question:'A={(0,0),(2,0)}，B={(0,0),(3,0)}。按双向平方 Chamfer 和式，CD(A,B) 是多少？',answer:'2',insight:'A→B 最近邻平方距离和为1；B→A 最近邻平方距离和也为1，因此双向和为2。'},
   experiment:'固定同一几何表面，分别改变采样密度、点数、离群点比例和局部缺失。比较单向/双向 Chamfer、均值/求和归一化和 F-score，检查指标排序是否因采样策略改变。',
   code:'实现双向最近邻平方距离；测试点集顺序置换不变、A/B 交换对称、重复点、空集合和离群点。用 brute force 作为小规模真值，再与 KD-tree 近邻结果对拍。',
-  pitfalls:'本题 checkpoint 的双向和为2；不要误把两个方向取平均，也不要把 Chamfer 当成点对一一匹配误差。'
+  pitfalls:'本题使用双向和式；若改用双向均值，数值会改变。不要把 Chamfer 当成点对一一匹配误差。'
  },
  u74:{
   title:'Kalman 更新：从最小方差推到增益',
