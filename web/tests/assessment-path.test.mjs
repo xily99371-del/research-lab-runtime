@@ -5,6 +5,7 @@ import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {GUIDES} from '../src/guided/catalog.js';
 import {TASK_PATHS,taskReadiness,nextReadinessStep} from '../src/guided/assessment-path.js';
+import {ALGORITHMS,ROS,publicSuite} from '../lib/tasks.js';
 
 test('every automatic task has an explicit course path',()=>{
  assert.equal(Object.keys(TASK_PATHS).length,PROBLEMS.length+EXPANDED_PROBLEMS.length+HOT_PROBLEMS.length);
@@ -33,4 +34,15 @@ test('no old self-check, viewed stage, or unrelated online pass grants readiness
 test('all mapped task routes point to actual existing course IDs',()=>{
  const valid=new Set(Object.keys(GUIDES));
  for(const [task,path]of Object.entries(TASK_PATHS))for(const id of path.courses)assert.ok(valid.has(id),task+':'+id);
+});
+
+test('public sample API source contains only explicit public cases',()=>{
+ for(const id of ALGORITHMS){const samples=publicSuite(id);assert.ok(samples.length>=1,id+' has no public sample');assert.ok(samples.every(x=>x.name.startsWith('公开样例')&&x.input!==undefined&&Object.hasOwn(x,'expected')),id);}
+ for(const id of ROS)assert.deepEqual(publicSuite(id),[]);
+});
+test('graph search readiness includes the required data-structure and graph units',()=>{
+ for(const id of ['bfs','dijkstra','astar','topological_sort','connected_components']){
+  assert.ok(TASK_PATHS[id].courses.includes('u2'),id+' should include data structures');
+  assert.ok(TASK_PATHS[id].courses.includes('u3'),id+' should include graph theory');
+ }
 });

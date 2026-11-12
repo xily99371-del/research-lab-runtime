@@ -7,6 +7,7 @@ const errors=[];
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}});
  page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/api/samples?task_id=*',route=>{const taskId=new URL(route.request().url()).searchParams.get('task_id');return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({task_id:taskId,samples:[{name:'公开样例 1',input:{nums:[2,7,11,15],target:9},expected:[0,1]},{name:'公开样例 2',input:{nums:[3,3],target:6},expected:[0,1]}]})});});
  const response=await page.goto(base,{waitUntil:'networkidle'});assert.equal(response.status(),200);
  await page.waitForSelector('.learn-hero');
  await page.locator('nav button[data-page="code"]').click();
@@ -33,6 +34,10 @@ try{
   await item.click();
   const panel=page.locator('.assessment-readiness');
   assert.ok(await panel.locator('.assessment-path-row').count()>0,'missing course mapping: '+id);
+  assert.equal(await page.locator('.sample-panel').count(),1,'missing structured public samples: '+id);
+  assert.ok(await page.locator('.sample-io').count()>=2,'missing input/expected output pair: '+id);
+  assert.equal(await page.getByRole('button',{name:'运行公开样例'}).count(),1,'missing sample-run action: '+id);
+  assert.equal(await page.getByRole('button',{name:'提交完整测试集'}).count(),1,'missing full-submit action: '+id);
   assert.equal(await panel.getByRole('button',{name:/提前挑战|开始自动评测/}).count(),1,'missing challenge action: '+id);
   const languages=await page.locator('#code-language option').allTextContents();
   if(!id.startsWith('ros_'))assert.ok(languages.some(x=>x.includes('Python'))&&languages.some(x=>x.includes('C++')),'missing language support: '+id);
@@ -49,6 +54,9 @@ try{
  assert.equal(await page.locator('.learn-course-list .course-item').count(),96);
  await page.locator('.course-item[data-unit="u2"]').click();await page.locator('[data-stage="2"]').click();
  assert.ok(await page.locator('.learn-links .assessment-path-card').count()>0);
+ await page.locator('.course-item[data-unit="u3"]').click();await page.locator('[data-stage="2"]').click();
+ assert.ok(await page.getByText(/图搜索：从图表示到可验证的最短路/).count()>0);
+ assert.ok(await page.getByText(/第 5 步｜A\*/).count()>0);
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify({base,totalTasks:100,progressivePaths:18,categoryCount:categories.size,difficultyLevels:[...levels],courseMappings:'100/100',sample:samples,mobileWidth:390,courses:96,browserErrors:errors}));
 }finally{await browser.close();}

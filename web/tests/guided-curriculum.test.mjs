@@ -13,6 +13,7 @@ import {LEGACY_LESSON_FORMULAS} from '../src/lesson-formulas.js';
 import {PROBLEMS} from '../src/problems.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
+import {PRACTICE_LADDERS} from '../src/guided/practice-ladders.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
 
@@ -65,4 +66,11 @@ test('independent/transfer evidence and server verdicts remain distinct',()=>{
 test('nested stage edits survive three-way merge and conflicts are not overwritten',()=>{
  const b=emptyState();b.progress.u1={note:'old',learning:{stage:1,hintsRevealed:0}};const l=structuredClone(b),r=structuredClone(b);l.progress.u1.learning.hintsRevealed=1;r.progress.u1.note='remote';const m=merge3(b,l,r);assert.equal(m.conflicts.length,0);assert.equal(m.value.progress.u1.note,'remote');assert.equal(m.value.progress.u1.learning.hintsRevealed,1);
  r.progress.u1.learning.hintsRevealed=2;assert.ok(merge3(b,l,r).conflicts.length>0);
+});
+
+test('advanced practice ladders contain staged implementation contracts',()=>{
+ for(const id of ['u3','u16','u32','u39']){
+  const ladder=PRACTICE_LADDERS[id];assert.ok(ladder,id);assert.ok(ladder.steps.length>=4,id);
+  for(const step of ladder.steps){assert.ok(step.title.length>5);assert.ok(step.objective.length>20);assert.ok(step.method.length>20);assert.ok(step.input!==undefined);assert.ok(step.expected!==undefined);}
+ }
 });
