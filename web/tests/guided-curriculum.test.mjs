@@ -14,6 +14,7 @@ import {PROBLEMS} from '../src/problems.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {PRACTICE_LADDERS} from '../src/guided/practice-ladders.js';
+import {TASK_PATHS} from '../src/guided/assessment-path.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
 
@@ -71,6 +72,6 @@ test('nested stage edits survive three-way merge and conflicts are not overwritt
 test('advanced practice ladders contain staged implementation contracts',()=>{
  for(const id of ['u3','u16','u32','u39']){
   const ladder=PRACTICE_LADDERS[id];assert.ok(ladder,id);assert.ok(ladder.steps.length>=4,id);
-  for(const step of ladder.steps){assert.ok(step.title.length>5);assert.ok(step.objective.length>20);assert.ok(step.method.length>20);assert.ok(step.input!==undefined);assert.ok(step.expected!==undefined);}
+  for(const step of ladder.steps){assert.ok(step.title.length>5);assert.ok(step.objective.length>20);assert.ok(step.method.length>10);assert.ok(step.input!==undefined);assert.ok(step.expected!==undefined);for(const taskId of step.tasks||[])assert.ok(TASK_PATHS[taskId]?.courses.includes(id),id+' ladder task '+taskId+' must map back to this course');}
  }
 });

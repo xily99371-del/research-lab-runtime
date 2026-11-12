@@ -46,3 +46,13 @@ test('graph search readiness includes the required data-structure and graph unit
   assert.ok(TASK_PATHS[id].courses.includes('u3'),id+' should include graph theory');
  }
 });
+
+test('sample endpoint serves only structured public examples and rejects unsupported tasks',async()=>{
+ const {default:handler}=await import('../api/samples.js');
+ const makeRes=()=>({statusCode:200,headers:{},body:null,setHeader(k,v){this.headers[k]=v;},status(n){this.statusCode=n;return this;},json(v){this.body=v;return this;}});
+ const ok=makeRes();await handler({method:'GET',query:{task_id:'two_sum'}},ok);
+ assert.equal(ok.statusCode,200);assert.equal(ok.body.task_id,'two_sum');assert.ok(ok.body.samples.length>=1);
+ for(const sample of ok.body.samples)assert.deepEqual(Object.keys(sample).sort(),['expected','input','name']);
+ const ros=makeRes();await handler({method:'GET',query:{task_id:'ros_topic'}},ros);assert.equal(ros.statusCode,404);
+ const method=makeRes();await handler({method:'POST',query:{task_id:'two_sum'}},method);assert.equal(method.statusCode,405);
+});

@@ -9,7 +9,7 @@ u3:{title:'图搜索：从图表示到可验证的最短路',intro:'先保证状
 u16:{title:'梯度下降：从损失函数到数值验证',intro:'把一次更新拆成前向、损失、解析梯度、参数更新四个可观测量。先做单样本手算，再扩展 batch；每一步都用独立计算核对。',steps:[
 {title:'第 1 步｜前向与损失',objective:'模型 y_hat=wx+b，单样本平方损失 L=0.5(y_hat-y)^2。先写出预测和损失，不调用优化器。',input:{x:2,y:4,w:0,b:0},expected:{y_hat:0,loss:8},method:'保留中间量，检查 residual=y_hat-y 的符号。',tasks:[]},
 {title:'第 2 步｜链式法则求梯度',objective:'由 dL/dy_hat=y_hat-y、dy_hat/dw=x、dy_hat/db=1，得到 dL/dw=(y_hat-y)x、dL/db=y_hat-y。',input:{x:2,y:4,w:0,b:0},expected:{dw:-8,db:-4},method:'分别对 w、b 求导；不要把 loss 当 gradient。',tasks:['linear_regression_step']},
-{title:'第 3 步｜执行一次更新',objective:'w_new=w-lr*dw，b_new=b-lr*db。注意学习率作用于梯度，不作用于预测值。',input:{x:2,y:4,w:0,b:0,lr:0.1},expected:{w:0.8,b:0.4},method:'更新后重新前向计算，确认损失从 8 降至 2.88。',tasks:['linear_regression_step']},
+{title:'第 3 步｜执行一次更新',objective:'w_new=w-lr*dw，b_new=b-lr*db。注意学习率作用于梯度，不作用于预测值。',input:{x:2,y:4,w:0,b:0,lr:0.1},expected:[0.8,0.4,8],method:'更新后重新前向计算，确认损失从 8 降至 2.88。',tasks:['linear_regression_step']},
 {title:'第 4 步｜有限差分梯度检查',objective:'用中心差分 [L(θ+ε)-L(θ-ε)]/(2ε) 近似导数，与解析梯度比较。改变 ε，观察截断误差和浮点误差的折中。',input:{x:2,y:4,w:0.3,b:-0.2,epsilon:0.0001},expected:'finite-difference gradient ≈ analytic gradient',method:'分别检查 dw、db；报告相对误差，不只看一次训练 loss 是否下降。',tasks:['linear_regression_step']},
 {title:'第 5 步｜扩展到 batch 与正则项',objective:'明确 loss 使用 sum 还是 mean。加入 L2 正则时，说明是 λ/2||w||² 还是 λ||w||²，梯度系数随定义改变。',input:{batch:3,reduction:'mean',regularization:'lambda/2 * ||w||^2'},expected:'batch gradient equals mean of per-sample gradients plus lambda*w',method:'用小 batch 手算对拍；固定验证集和随机种子，再比较学习率与正则强度。',tasks:['linear_regression_step','binary_cross_entropy']}
 ]},
@@ -23,8 +23,8 @@ u32:{title:'相机几何：投影、反投影与误差传播',intro:'每一步�
 u39:{title:'点云几何：邻域、采样与距离度量',intro:'把点云当作无序点集。每次操作都检查点顺序、重复点、密度变化和坐标尺度，不用单一可视化代替几何指标。',steps:[
 {title:'第 1 步｜质心与平移性质',objective:'质心 μ=(1/N)Σp_i。所有点平移 t 后，质心也应平移 t；点顺序不应影响结果。',input:{points:[[0,0,0],[2,0,0],[0,2,0]]},expected:[0.6666666667,0.6666666667,0],method:'随机打乱点顺序并整体平移所有点，检查质心是否只随平移向量变化。',tasks:['point_centroid']},
 {title:'第 2 步｜KNN 邻域',objective:'按平方欧氏距离排序，返回最近 k 个点的索引；同距离时用原始索引稳定打破平局。',input:{points:[[0,0,0],[1,0,0],[-1,0,0],[3,0,0]],query:[0,0,0],k:2},expected:[0,1],method:'先检查距离数组，再检查排序索引；注意平方距离不改变近邻次序。',tasks:['knn_points']},
-{title:'第 3 步｜体素量化与局部质心',objective:'体素索引 v=floor(p/s)。负坐标必须使用 floor 而非向零截断。',input:{points:[[-0.1,0,0],[0.1,0,0],[1.1,0,0]],voxel_size:1},expected:[[-0.1,0,0],[0.1,0,0],[1.1,0,0]],method:'比较不同 voxel_size；输出顺序按体素坐标固定，质心保留原坐标。',tasks:['voxel_downsample']},
+{title:'第 3 步｜体素量化与局部质心',objective:'体素索引 v=floor(p/s)。负坐标必须使用 floor 而非向零截断。',input:{points:[[0.1,0.1,0],[0.2,0.2,0],[-0.1,0,0],[1.1,0,0]],voxel_size:1},expected:[[-0.1,0,0],[0.15,0.15,0],[1.1,0,0]],method:'比较不同 voxel_size；输出顺序按体素坐标固定，质心保留原坐标。',tasks:['voxel_downsample']},
 {title:'第 4 步｜Farthest Point Sampling',objective:'每轮选择到已选集合最小距离最大的点，近似最大化采样覆盖半径。',input:{points:[[0,0,0],[1,0,0],[3,0,0],[6,0,0]],k:2,start:0},expected:[0,3],method:'维护每个点到已选集合的最小平方距离，避免每轮重算全部两两距离。',tasks:['fps']},
-{title:'第 5 步｜密度与度量边界',objective:'Chamfer distance 对两个方向的最近邻距离取平均；密度不一致时，点多的一侧对求和版本贡献更大。',input:{source:[[0,0,0]],target:[[0,0,0],[1,0,0]]},expected:'symmetric Chamfer depends on the chosen reduction convention',method:'写清 mean/sum、单向/双向、平方/非平方约定，再对密度变化做消融。',tasks:['chamfer_distance']}
+{title:'第 5 步｜密度与度量边界',objective:'Chamfer distance 对两个方向的最近邻距离取平均；密度不一致时，点多的一侧对求和版本贡献更大。',input:{a:[[0,0,0],[1,0,0]],b:[[0,0,0],[2,0,0]]},expected:0.5,method:'写清 mean/sum、单向/双向、平方/非平方约定，再对密度变化做消融。',tasks:['chamfer_distance']}
 ]}
 };
