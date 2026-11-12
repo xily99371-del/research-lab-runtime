@@ -27,7 +27,7 @@ const note=(text,kind='')=>el('div',text,'notice '+kind);
 const hero=(h,p)=>box('hero',el('small','PERSONAL RESEARCH WORKSPACE'),el('h2',h),el('p',p));
 let sb=null,config=null,user=null,session=null,courses=[],data=emptyState(),base=emptyState(),version=0,dirty=false,inFlight=false,pendingConflict=null,jobs=[];
 let epoch=0,revision=0,timer=null,toastTimer=null,page='dashboard',selectedTask='attention',taskTrack='全部',taskLevel='全部',taskPath='全部',taskLang='全部',taskQuery='',language='python',taskMode='code',running=false;
-const reports=new Map();
+const reports=new Map(),sampleReports=new Map(),sampleCache=new Map(),sampleLoading=new Map();
 // Keep the old cache namespace so guest drafts and logged-in offline edits survive.
 const cacheKey=()=> 'research-lab-v34:'+(user?.id||'guest');
 function cache(){try{localStorage.setItem(cacheKey(),JSON.stringify({data,base,version,dirty}));}catch{setBanner('本机保存失败；请导出备份。不要清空浏览器数据。','warn');}}
@@ -90,12 +90,29 @@ function openCourseStage(id,stage){
 }
 function openTask(id){selectedTask=id;taskMode='code';taskTrack='全部';taskLevel='全部';taskQuery='';taskLang='全部';navigate('code');}
 function rerenderWithFocus(id){const a=$(id),start=a?.selectionStart,end=a?.selectionEnd;render();const b=$(id);if(b){b.focus();if(start!=null)try{b.setSelectionRange(start,end);}catch{}}}
-function reportView(report){const human=humanizeReport(report),wrap=box('learn-report');wrap.setAttribute('role','status');wrap.append(el('h3',human.title),note(human.message+(report.persisted===false?' 成绩尚未成功入库；请保存本次原始报告。':''),report.pass?'ok':'warn'),el('p',human.help,'muted'));
+function reportView(report){const human=humanizeReport(report),wrap=box('learn-report');wrap.setAttribute('role','status');wrap.append(el('h3',report.mode==='sample'?'公开样例运行结果':human.title),note(human.message+(report.persisted===false?' 成绩尚未成功入库；请保存本次原始报告。':''),report.pass?'ok':'warn'),el('p',report.mode==='sample'?'本次只运行公开样例，不计入正式提交记录，也不会消耗隐藏测试。':human.help,'muted'));
  if(report.passed!==undefined)wrap.append(el('p','通过 '+report.passed+'/'+report.total+' 个测试；评分 '+report.score+'。','muted'));
  if(report.warning)wrap.append(note(report.warning,'warn'));
  if(report.stderr)wrap.append(el('pre',report.stderr,'code-output'));
  for(const c of report.cases||[]){const d=el('details',null,'learn-details');d.append(el('summary',(c.pass?'✓ ':'× ')+(c.name||c.test||'测试')));if(c.input!==undefined)d.append(el('pre',JSON.stringify({input:c.input,expected:c.expected,actual:c.actual},null,2),'code-output'));else d.append(el('p','隐藏测试只展示结果，不泄露完整输入与答案。','muted'));wrap.append(d);}
  const raw=el('details',null,'learn-details');raw.append(el('summary','查看原始评测报告'),el('pre',JSON.stringify(report,null,2),'code-output'));wrap.append(raw);return wrap;}
+function renderSampleList(panel,samples){
+ panel.replaceChildren(el('h3','公开样例：输入与预期输出'));
+ if(!samples?.length){panel.append(note('该题没有独立函数样例。ROS 2 题目会在完整评测中启动节点并进行真实通信验证。','neutral'));return;}
+ for(const [i,s] of samples.entries()){
+  const card=box('sample-case',el('strong',s.name||('公开样例 '+(i+1))));
+  card.append(box('sample-io',el('small','Sample Input'),el('pre',JSON.stringify(s.input,null,2),'code-output')),
+   box('sample-io',el('small','Expected Output'),el('pre',JSON.stringify(s.expected,null,2),'code-output')));
+  panel.append(card);
+ }
+}
+function loadPublicSamples(taskId,panel){
+ panel.append(el('h3','公开样例：输入与预期输出'),el('p','正在加载样例…','muted'));
+ if(sampleCache.has(taskId)){renderSampleList(panel,sampleCache.get(taskId));return;}
+ let pending=sampleLoading.get(taskId);
+ if(!pending){pending=fetch('/api/samples?task_id='+encodeURIComponent(taskId),{cache:'force-cache'}).then(async r=>{const body=await r.json();if(!r.ok)throw Error(body.error||'样例加载失败');return body.samples||[];}).then(samples=>{sampleCache.set(taskId,samples);return samples;}).finally(()=>sampleLoading.delete(taskId));sampleLoading.set(taskId,pending);}
+ pending.then(samples=>{if(panel.isConnected)renderSampleList(panel,samples);}).catch(err=>{if(panel.isConnected)panel.replaceChildren(el('h3','公开样例'),note(err.message,'warn'));});
+}
 function renderCode(root){
  root.append(hero('任务中心：按知识路径逐级训练。','从高频基础题到真实AI、视觉与机器人模块；每道题都有明确应用背景、分级目标和自动测试。'));
  root.append(box('actions',btn('自动评测任务（'+PROBLEMS.length+'）',()=>{taskMode='code';render();},taskMode==='code'?'primary':''),btn('课程实践任务（'+courses.length+'）',()=>{taskMode='project';render();},taskMode==='project'?'primary':'')));
@@ -110,7 +127,7 @@ function renderCode(root){
  for(const p of ps){const passed=jobs.some(j=>j.task_id===p.id&&j.status==='passed');const b=btn('',()=>{selectedTask=p.id;render();},'task-item '+(p.id===selectedTask?'active':''));b.dataset.task=p.id;const readiness=taskReadiness(p.id,data.progress);const meta=TASK_META[p.id];b.append(el('b',(passed?'✓ ':'')+p.title),el('small',p.track+' · '+p.level+' · '+(meta?'第 '+meta.stage+'/'+meta.stages+' 关':'未编排')+' · '+p.langs.join(' / ')),el('small',readiness.ready?'建议准备已完成':readiness.label+' · '+readiness.checksDone+'/'+readiness.checksTotal+'项'));list.append(b);}
  const p=PROBLEMS.find(p=>p.id===selectedTask);if(!p){detail.append(el('p','没有匹配的评测题。这个方向也可能有课程实践任务。'),btn('转到课程实践',()=>{taskMode='project';render();}));root.append(box('task-grid',list,detail));return;}
  if(!p.langs.includes(language))language=p.langs[0];if(taskLang!=='全部'&&p.langs.includes(langKey[taskLang]))language=langKey[taskLang];
- const meta=TASK_META[p.id],path=meta&&TASK_PROGRESSIONS.find(x=>x.id===meta.pathId);detail.append(el('span',p.track+' · '+p.level+(meta?' · 第 '+meta.stage+'/'+meta.stages+' 关':''),'pill blue'),el('h2',p.title),richText(p.desc));if(meta&&path){const stage=box('assessment-readiness');stage.append(el('h3','递进路径：'+path.title),el('p','第 '+meta.stage+' 关，共 '+meta.stages+' 关。'+path.audience+'。','muted'),el('p','实际应用：'+meta.application,'muted'));const nav=box('actions');if(meta.stage>1){const prev=path.tasks[meta.stage-2],prevTask=PROBLEMS.find(x=>x.id===prev);nav.append(btn('上一关：'+(prevTask?.title||prev),()=>{selectedTask=prev;render();}));}if(meta.stage<meta.stages){const next=path.tasks[meta.stage],nextTask=PROBLEMS.find(x=>x.id===next);nav.append(btn('下一关：'+(nextTask?.title||next),()=>{selectedTask=next;render();},'primary'));}stage.append(nav);detail.append(stage);}detail.append(el('h3','公开示例'),el('pre',p.example,'code-output'),el('h3','为什么这样做'),richText(p.concept));
+ const meta=TASK_META[p.id],path=meta&&TASK_PROGRESSIONS.find(x=>x.id===meta.pathId);detail.append(el('span',p.track+' · '+p.level+(meta?' · 第 '+meta.stage+'/'+meta.stages+' 关':''),'pill blue'),el('h2',p.title),richText(p.desc));if(meta&&path){const stage=box('assessment-readiness');stage.append(el('h3','递进路径：'+path.title),el('p','第 '+meta.stage+' 关，共 '+meta.stages+' 关。'+path.audience+'。','muted'),el('p','实际应用：'+meta.application,'muted'));const nav=box('actions');if(meta.stage>1){const prev=path.tasks[meta.stage-2],prevTask=PROBLEMS.find(x=>x.id===prev);nav.append(btn('上一关：'+(prevTask?.title||prev),()=>{selectedTask=prev;render();}));}if(meta.stage<meta.stages){const next=path.tasks[meta.stage],nextTask=PROBLEMS.find(x=>x.id===next);nav.append(btn('下一关：'+(nextTask?.title||next),()=>{selectedTask=next;render();},'primary'));}stage.append(nav);detail.append(stage);}detail.append(el('h3','为什么这样做'),richText(p.concept));const samplePanel=box('sample-panel');detail.append(samplePanel);loadPublicSamples(p.id,samplePanel);
  const readiness=taskReadiness(p.id,data.progress),pathPanel=box('assessment-readiness');
  pathPanel.append(el('h3','开始自动评测前：你的课程准备度'));
  pathPanel.append(el('p',readiness.why+'。建议达到：关联课程的例题核对正确，并完成带提示练习、提交实际输出与解释。','muted'));
@@ -127,22 +144,33 @@ function renderCode(root){
  detail.append(pathPanel);
  const related=(TASK_PATHS[p.id]?.courses||[]).map(id=>courses.find(c=>c.id===id)).filter(Boolean);for(const c of related)detail.append(btn('回到分步课程：'+c.title,()=>openCourse(c.id)));
  const lang=el('select');lang.id='code-language';lang.setAttribute('aria-label','提交代码语言');for(const l of p.langs){const o=el('option',l==='cpp'?'C++17':l==='ros2_python'?'ROS 2 Python':'Python 3');o.value=l;lang.append(o);}lang.value=language;lang.onchange=()=>{language=lang.value;render();};lang.disabled=running;
- const editor=el('textarea');editor.id='code-editor';editor.className='field editor';editor.spellcheck=false;editor.setAttribute('aria-label','代码编辑器');const draft=data.drafts[p.id+'-'+language];editor.value=typeof draft==='string'?draft:starter(language);editor.oninput=()=>{data.drafts[p.id+'-'+language]=editor.value;changed();};editor.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();submitCode();}};
- const submit=btn(running?'正在评测…':'提交并运行测试',submitCode,'primary');submit.disabled=running;
+ const editor=el('textarea');editor.id='code-editor';editor.className='field editor';editor.spellcheck=false;editor.setAttribute('aria-label','代码编辑器');const draft=data.drafts[p.id+'-'+language];editor.value=typeof draft==='string'?draft:starter(language);editor.oninput=()=>{data.drafts[p.id+'-'+language]=editor.value;changed();};editor.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runSampleCode();}};
+ const runSample=btn(running?'正在运行…':'运行公开样例',runSampleCode,'secondary');runSample.disabled=running||language==='ros2_python';const submit=btn(running?'正在评测…':'提交完整测试集',submitCode,'primary');submit.disabled=running;
  detail.append(el('h3','语言与代码'),lang,editor,box('actions',submit,btn('保存草稿',()=>{data.drafts[p.id+'-'+language]=editor.value;changed();notify('草稿已保存');}),btn('恢复模板',()=>{if(editor.value.trim()&&!confirm('恢复将替换当前代码草稿，是否继续？'))return;editor.value=starter(language);data.drafts[p.id+'-'+language]=editor.value;changed();})));
- detail.append(note('调试信息请输出到stderr。提交后先判断是编译、运行、超时还是测试失败；不要把环境故障当成不会算法。'));
- const out=box('learn-code-result');out.id='code-result';const report=reports.get(p.id+'-'+language);if(report)out.append(reportView(report));else out.append(el('p','尚未提交。使用Ctrl/Cmd+Enter可运行测试。','muted'));detail.append(out);
- const recent=jobs.filter(j=>j.task_id===p.id).slice(0,5);detail.append(el('h3','服务端提交记录'));for(const j of recent)detail.append(box('record',el('strong',j.status+' · '+j.language),el('p',new Date(j.created_at).toLocaleString('zh-CN')+' · '+(j.report?.score??0)+'分'),btn('查看本次报告',()=>{reports.set(p.id+'-'+language,j.report||{});render();})));
+ detail.append(note('先运行公开样例，检查输入、预期输出与实际输出；确认后再提交完整测试集。调试信息请输出到stderr。'));
+  const sampleOut=box('learn-code-result');sampleOut.id='sample-result';const sampleReport=sampleReports.get(p.id+'-'+language);if(sampleReport)sampleOut.append(reportView(sampleReport));else sampleOut.append(el('p','尚未运行公开样例。','muted'));detail.append(sampleOut);
+  const out=box('learn-code-result');out.id='code-result';const report=reports.get(p.id+'-'+language);if(report)out.append(reportView(report));else out.append(el('p','尚未提交完整测试集。','muted'));detail.append(out);
+  const recent=jobs.filter(j=>j.task_id===p.id).slice(0,5);detail.append(el('h3','服务端提交记录'));for(const j of recent)detail.append(box('record',el('strong',j.status+' · '+j.language),el('p',new Date(j.created_at).toLocaleString('zh-CN')+' · '+(j.report?.score??0)+'分'),btn('查看本次报告',()=>{reports.set(p.id+'-'+language,j.report||{});render();})));
  root.append(box('task-grid',list,detail));
 }
-async function submitCode(){
- if(!user||!session?.access_token){notify('在线代码评测需要邮箱登录；课程核对与本机练习可以先使用。');$('auth-dialog').showModal();return;}
+async function executeCode(mode='submit'){
+ if(!user||!session?.access_token){notify('在线代码运行需要邮箱登录；课程讲解和本机练习可以先使用。');$('auth-dialog').showModal();return;}
  if(running)return;const p=PROBLEMS.find(x=>x.id===selectedTask),editor=$('code-editor');if(!p||!editor)return;
- const code=editor.value,lang=language,key=p.id+'-'+lang,e=epoch;if(!code.trim())return notify('请先填写代码');data.drafts[key]=code;changed();running=true;reports.set(key,{stage:'running',error:'正在创建隔离环境并运行测试…'});render();
- try{const {data:s,error}=await sb.auth.getSession();if(error||!s.session)throw Error('登录会话已失效，请重新登录。');session=s.session;const r=await fetch('/api/evaluate',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({task_id:p.id,language:lang,code})});const text=await r.text();let result;try{result=JSON.parse(text);}catch{throw Error('评测服务没有返回JSON（HTTP '+r.status+'），请保留草稿后重试。');}if(e!==epoch)return;reports.set(key,result);if(!r.ok)notify(result.error||'评测请求失败');try{await history();}catch(err){notify('评测已返回，但历史读取失败：'+err.message);}}
- catch(err){if(e===epoch)reports.set(key,{status:'error',stage:'infrastructure',error:err.message});}
+ if(mode==='sample'&&language==='ros2_python')return notify('ROS 2 题目请使用完整集成评测。');
+ const code=editor.value,lang=language,key=p.id+'-'+lang,e=epoch,target=mode==='sample'?sampleReports:reports;
+ if(!code.trim())return notify('请先填写代码');data.drafts[key]=code;changed();running=true;
+ target.set(key,{stage:'running',mode,error:mode==='sample'?'正在运行公开样例…':'正在创建隔离环境并运行完整测试集…'});render();
+ try{
+  const {data:s,error}=await sb.auth.getSession();if(error||!s.session)throw Error('登录会话已失效，请重新登录。');session=s.session;
+  const r=await fetch('/api/evaluate',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({task_id:p.id,language:lang,code,mode})});
+  const text=await r.text();let result;try{result=JSON.parse(text);}catch{throw Error('评测服务没有返回JSON（HTTP '+r.status+'），请保留草稿后重试。');}
+  if(e!==epoch)return;target.set(key,{...result,mode});if(!r.ok)notify(result.error||'运行请求失败');
+  if(mode==='submit')try{await history();}catch(err){notify('评测已返回，但历史读取失败：'+err.message);}
+ }catch(err){if(e===epoch)target.set(key,{status:'error',stage:'infrastructure',mode,error:err.message});}
  finally{running=false;if(e===epoch&&page==='code')render();}
 }
+async function submitCode(){return executeCode('submit');}
+async function runSampleCode(){return executeCode('sample');}
 const recordConfigs={
  research:{title:'研究与实验',description:'围绕一条主线记录可证伪问题、基线、实验和失败案例；不会把“写了记录”自动算成研究完成。',fields:[['title','研究任务标题'],['track','方向'],['question','问题与假设','textarea'],['method','基线、对照、数据与配置','textarea'],['result','实际结果、失败案例与下一步','textarea']]},
  papers:{title:'论文笔记',description:'把论文主张对应到公式、实现和证据；记录你理解不了的步骤和下一次验证。',fields:[['title','论文标题'],['venue','会议 / 期刊 / 年份'],['note','问题、方法、证据、局限与疑问','textarea']]},

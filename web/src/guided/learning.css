@@ -5,3 +5,11 @@
 
 .assessment-path-card{border:1px solid #dbe5f0;background:#f8fbff;border-radius:10px;padding:13px;margin:12px 0;min-width:0}.assessment-path-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.assessment-path-head b,.assessment-path-head strong{font-size:13px;line-height:1.6}.assessment-state{font-size:11px;color:#8b622f;background:#fff3df;border-radius:20px;padding:5px 9px}.assessment-state.ready{color:#236347;background:#e8f6ee}.assessment-path-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #e3eaf2;margin-top:8px}.assessment-path-row strong{font-size:12px;line-height:1.55}.assessment-checks{font-size:11px;color:#64758a;line-height:1.6}.assessment-path-row button{font-size:11px;padding:7px 10px}.assessment-path-card .actions{margin:10px 0 0}.assessment-path-card .notice{margin:10px 0 0;font-size:12px;line-height:1.75}.task-item small+small{color:#58799e;font-weight:600}.learn-practice-card .assessment-path-card{margin:12px 0}.learn-practice-card .assessment-path-row{grid-template-columns:1fr auto}.learn-practice-card .assessment-path-row button{grid-column:1/-1;justify-self:start}
 @media(max-width:650px){.assessment-path-row{grid-template-columns:minmax(0,1fr);gap:5px}.assessment-path-row button{justify-self:start}.assessment-path-head{align-items:flex-start}.assessment-path-card{padding:11px}.learn-practice-card .assessment-path-row{grid-template-columns:1fr}}
+
+.sample-panel{border:1px solid #d8e3ef;border-radius:12px;padding:14px;margin:16px 0;background:#f8fbff;min-width:0}
+.sample-panel h3{margin:0 0 12px;font-size:15px}
+.sample-case{border-top:1px solid #dce5ef;padding:12px 0;display:grid;gap:9px;min-width:0}
+.sample-io{display:grid;gap:5px;min-width:0}
+.sample-io small{font-size:11px;font-weight:700;letter-spacing:.04em;color:#526985}
+.sample-io pre{margin:0;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#152b43;color:#e0eaf7;padding:12px;border-radius:8px;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}
+.sample-case>strong{font-size:12px;color:#355a84}
