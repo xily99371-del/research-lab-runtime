@@ -14,6 +14,7 @@ import {PROBLEMS} from '../src/problems.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {PRACTICE_LADDERS} from '../src/guided/practice-ladders.js';
+import {INTERVIEW_BANK} from '../src/guided/interview-bank.js';
 import {TASK_PATHS} from '../src/guided/assessment-path.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
@@ -74,4 +75,9 @@ test('advanced practice ladders contain staged implementation contracts',()=>{
   const ladder=PRACTICE_LADDERS[id];assert.ok(ladder,id);assert.ok(ladder.steps.length>=4,id);
   for(const step of ladder.steps){assert.ok(step.title.length>5);assert.ok(step.objective.length>20);assert.ok(step.method.length>10);assert.ok(step.input!==undefined);assert.ok(step.expected!==undefined);for(const taskId of step.tasks||[])assert.ok(TASK_PATHS[taskId]?.courses.includes(id),id+' ladder task '+taskId+' must map back to this course');}
  }
+});
+
+test('oral defense bank covers core research internship topics with follow-up chains',()=>{
+ const expected=["u16","u32","u33","u37","u39","u41","u49","u54","u55","u72","u74","u75","u76","u85","u86","u87"];
+ for(const id of expected){const bank=INTERVIEW_BANK[id];assert.ok(bank,id+' interview bank missing');assert.ok(GUIDES[id]);assert.ok(bank.questions.length>=2);for(const q of bank.questions){assert.ok(q.prompt.length>25);assert.ok(q.followups.length>=3);assert.ok(q.points.length>=3);assert.ok(q.pitfalls.length>=1);}}
 });

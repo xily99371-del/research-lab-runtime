@@ -4,6 +4,7 @@ import {richText} from './math.js';
 import {taskReadiness,TASK_PATHS} from './assessment-path.js';
 import './learning.css';
 import {PRACTICE_LADDERS} from './practice-ladders.js';
+import {INTERVIEW_BANK} from './interview-bank.js';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
 const e=(tag,text='',cls='')=>{const n=document.createElement(tag);if(text!==null)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -116,8 +117,25 @@ function lessonIndependent(ctx,c,g,p){
  ]));
  out.append(group('actions',button('进入迁移与复习',()=>setStage(ctx,c.id,4),'primary'),button('回到带提示练习',()=>setStage(ctx,c.id,2))));return out;
 }
+function interviewPractice(ctx,c,p){
+ const bank=INTERVIEW_BANK[c.id];if(!bank)return null;
+ const wrap=group('interview-practice');
+ wrap.append(title('科研面试拷问 · '+bank.title),callout('建议先离开屏幕，用 1–2 分钟口头回答主问题，再展开追问。回答应落到公式、代码、实验或反例；参考要点用于复盘，不是背诵稿。','neutral'));
+ for(const q of bank.questions){
+  const old=p.interviewAnswers?.[q.id]||{},card=group('interview-question');
+  card.append(e('span','ORAL DEFENSE · '+q.id,'interview-kicker'),e('h4',q.prompt),title('连续追问'));
+  const follow=group('interview-followups');q.followups.forEach((x,i)=>follow.append(e('p',(i+1)+'. '+x)));card.append(follow);
+  const answer=field('我的口头回答 / 推导 / 例子',old.answer||'');answer.input.rows=5;answer.input.placeholder='先给结论，再给推导依据、适用条件和验证方式。';card.append(answer.label);
+  const status=e('p',old.practicedAt?'上次练习：'+new Date(old.practicedAt).toLocaleString('zh-CN')+' · 自述记录，尚未经过人工评分':'尚未记录口头练习','muted');
+  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary')));
+  card.append(details('展开参考回答要点（答完再看）',[title('回答应覆盖'),...q.points.map(x=>e('p','• '+x)),title('常见失分点'),...q.pitfalls.map(x=>callout(x,'warn'))],false));
+  wrap.append(card);
+ }
+ return wrap;
+}
 function lessonTransfer(ctx,c,g,p){
  const out=group('learn-stage-content');out.append(title('把知识带回你的项目'),richText(g.transfer),title('这一结论的适用边界'),callout(g.boundary,'warn'));
+ const interview=interviewPractice(ctx,c,p);if(interview)out.append(interview);
  out.append(title('让实验有可能推翻你的解释'),evidenceForm(ctx,c.id,'transfer',[
  ['hypothesis','具体研究问题 / 假设；什么结果会推翻它'],['comparison','基线、对照、数据划分与实际结果'],['limits','失败案例、成本、局限与下一步']
  ]));

@@ -13,3 +13,12 @@
 .sample-io small{font-size:11px;font-weight:700;letter-spacing:.04em;color:#526985}
 .sample-io pre{margin:0;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#152b43;color:#e0eaf7;padding:12px;border-radius:8px;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}
 .sample-case>strong{font-size:12px;color:#355a84}
+
+.interview-practice{margin:18px 0;padding:16px;border:1px solid #cbd9e8;border-radius:14px;background:#f8fbff;min-width:0}
+.interview-practice>h3{margin-top:0}
+.interview-question{padding:15px 0;border-top:1px solid #dce5ef;min-width:0}
+.interview-kicker{font-size:10px;letter-spacing:.09em;font-weight:800;color:#55718f}
+.interview-question h4{font-size:15px;line-height:1.65;margin:8px 0 12px}
+.interview-followups{padding:10px 13px;background:#f2f6fa;border-radius:9px}
+.interview-followups p{margin:5px 0;font-size:13px;line-height:1.65}
+.interview-question textarea{min-height:120px}
