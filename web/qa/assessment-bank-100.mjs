@@ -38,7 +38,7 @@ try{
   await page.locator('.sample-io').first().waitFor({state:'visible',timeout:5000});
   assert.ok(await page.locator('.sample-io').count()>=2,'missing input/expected output pair: '+id);
   assert.equal(await page.getByRole('button',{name:'运行公开样例'}).count(),1,'missing sample-run action: '+id);
-  assert.equal(await page.getByRole('button',{name:'提交完整测试集'}).count(),1,'missing full-submit action: '+id);
+  assert.equal(await page.getByRole('button',{name:/提交完整测试集|等待前置关卡/}).count(),1,'missing full-submit action: '+id);
   assert.equal(await panel.getByRole('button',{name:/提前挑战|开始自动评测/}).count(),1,'missing challenge action: '+id);
   const languages=await page.locator('#code-language option').allTextContents();
   if(!id.startsWith('ros_'))assert.ok(languages.some(x=>x.includes('Python'))&&languages.some(x=>x.includes('C++')),'missing language support: '+id);
@@ -53,9 +53,12 @@ try{
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
  await page.locator('nav button[data-page="courses"]').click();
  assert.equal(await page.locator('.learn-course-list .course-item').count(),96);
+ assert.equal(await page.getByText('课程实践任务（96）').count(),0,'duplicate practice catalogue should be removed');
  await page.locator('.course-item[data-unit="u2"]').click();await page.locator('[data-stage="2"]').click();
+ assert.match(await page.locator('#toast').innerText(),/先在讲解阶段/,'guided practice must remain locked until the worked check passes');
+ await page.locator('[data-stage="1"]').click();await page.locator('input[aria-label="课堂核对答案"]').fill('3');await page.getByRole('button',{name:'核对答案'}).click();await page.locator('[data-stage="2"]').click();
  assert.ok(await page.locator('.learn-links .assessment-path-card').count()>0);
- await page.locator('.course-item[data-unit="u3"]').click();await page.locator('[data-stage="2"]').click();
+ await page.locator('.course-item[data-unit="u3"]').click();await page.locator('[data-stage="1"]').click();await page.locator('input[aria-label="课堂核对答案"]').fill('3');await page.getByRole('button',{name:'核对答案'}).click();await page.locator('[data-stage="2"]').click();
  assert.ok(await page.getByText(/图搜索：从图表示到可验证的最短路/).count()>0);
  assert.ok(await page.getByText(/第 5 步｜A\*/).count()>0);
  assert.deepEqual(errors,[]);
