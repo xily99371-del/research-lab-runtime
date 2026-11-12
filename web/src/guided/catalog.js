@@ -9,7 +9,7 @@ export const GUIDES=Object.fromEntries(GUIDE_LIST.map(g=>[g.id,g]));
 if(GUIDE_LIST.length!==96||Object.keys(GUIDES).length!==96)throw Error('The guided curriculum must cover the 96 existing IDs exactly.');
 export const EXACT_LINKS={
  u2:['two_sum','parentheses','top_k','union_find','sliding_window_max','three_sum','longest_substring','product_except_self','container_water','move_zeroes','rotate_array','valid_anagram','group_anagrams','subarray_sum','min_stack','daily_temperatures','reverse_linked_list','merge_two_lists','linked_list_cycle','remove_nth_from_end','reorder_list','kth_largest','merge_sorted_array'],
- u3:['bfs','dijkstra','astar','topological_sort','connected_components','max_depth_tree','invert_tree','level_order_tree','validate_bst','kth_smallest_bst','tree_diameter','lowest_common_ancestor','number_of_islands','rotting_oranges','course_schedule','reorder_list'],
+ u3:['bfs','dijkstra','astar','topological_sort','connected_components','max_depth_tree','invert_tree','level_order_tree','validate_bst','kth_smallest_bst','tree_diameter','lowest_common_ancestor','number_of_islands','rotting_oranges','course_schedule'],
  u4:['knapsack','lcs','coin_change','lis','max_subarray','merge_intervals','interval_scheduling','edit_distance','subsets','permutations','combination_sum','word_search','climbing_stairs','house_robber','unique_paths','decode_ways','jump_game'],
  u9:['matrix_multiply'],
  u15:['binary_search','kmp','longest_palindrome','search_rotated','find_min_rotated'],

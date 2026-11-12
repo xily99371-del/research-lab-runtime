@@ -3,6 +3,7 @@ import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit} from './mo
 import {richText} from './math.js';
 import {taskReadiness,TASK_PATHS} from './assessment-path.js';
 import './learning.css';
+import {PRACTICE_LADDERS} from './practice-ladders.js';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
 const e=(tag,text='',cls='')=>{const n=document.createElement(tag);if(text!==null)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -95,6 +96,7 @@ function lessonExplain(ctx,c,g,p){
 function lessonPractice(ctx,c,g,p){
  const out=group('learn-stage-content');out.append(title('这一小步具体做什么'),richText(g.guided.fixture),title('接口或交付骨架'));
  const pre=e('pre',null,'learn-code');pre.append(e('code',g.guided.signature));out.append(pre);
+ const ladder=PRACTICE_LADDERS[c.id];if(ladder){out.append(title(ladder.title),richText(ladder.intro));for(const [i,step]of ladder.steps.entries()){const content=[richText(step.objective),richText('实现要求：'+step.method)];if(step.input!==undefined){content.push(e('p','示例输入','muted'),e('pre',JSON.stringify(step.input,null,2),'code-output'),e('p','预期结果','muted'),e('pre',JSON.stringify(step.expected,null,2),'code-output'));}for(const id of step.tasks||[]){const task=ctx.problems.find(x=>x.id===id);if(task)content.push(button('打开对应自动评测：'+task.title,()=>ctx.openTask(id)));}out.append(details(step.title,content,i===0));}}
  out.append(group('actions',button('复制骨架',async()=>{try{await navigator.clipboard.writeText(g.guided.signature);ctx.notify('已复制');}catch{ctx.notify('浏览器未允许复制，请手动选择代码');}}),button('导出本节任务说明',()=>downloadTask(c,g)),button('加入周计划',()=>plan(ctx,c.id,2))));
  out.append(title('卡住时逐层展开提示'));
  const revealed=Math.min(3,Number(p.hintsRevealed)||0);for(let i=0;i<revealed;i++)out.append(callout('提示'+(i+1)+'：'+g.guided.hints[i],''));
