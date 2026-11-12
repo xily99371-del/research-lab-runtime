@@ -1,7 +1,7 @@
 name: Research Lab Verification
 on:
   push:
-    branches: [main]
+    branches: [main, curriculum-deepening]
   pull_request:
 permissions:
   contents: write
@@ -28,7 +28,7 @@ jobs:
           python-version: '3.12'
       - run: python -m compileall -q app
       - name: Commit verified source normalization
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/curriculum-deepening')
         run: |
           git config user.name 'research-lab-maintenance'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
