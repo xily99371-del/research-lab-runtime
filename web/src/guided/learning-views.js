@@ -127,7 +127,7 @@ function interviewPractice(ctx,c,p){
   const follow=group('interview-followups');q.followups.forEach((x,i)=>follow.append(e('p',(i+1)+'. '+x)));card.append(follow);
   const answer=field('我的口头回答 / 推导 / 例子',old.answer||'');answer.input.rows=5;answer.input.placeholder='先给结论，再给推导依据、适用条件和验证方式。';card.append(answer.label);
   const status=e('p',old.practicedAt?'上次练习：'+new Date(old.practicedAt).toLocaleString('zh-CN')+' · 自述记录，尚未经过人工评分':'尚未记录口头练习','muted');
-  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary')));
+  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary')));card.append(status);
   card.append(details('展开参考回答要点（答完再看）',[title('回答应覆盖'),...q.points.map(x=>e('p','• '+x)),title('常见失分点'),...q.pitfalls.map(x=>callout(x,'warn'))],false));
   wrap.append(card);
  }
