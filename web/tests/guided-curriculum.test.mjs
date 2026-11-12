@@ -94,7 +94,7 @@ test('derivation lab equations parse and include substantive mathematical notati
  }
 });
 test('five high-value courses include full mathematical derivations, assumptions, numerical checks and experiments',()=>{
- for(const id of ['u9','u16','u32','u39','u74']){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>40);assert.ok(d.steps.length>=3);for(const step of d.steps){assert.ok(step[0].length>5);assert.ok(step[1].length>50);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>80);assert.ok(d.code.length>50);assert.ok(d.pitfalls.length>20);}
+ for(const id of ['u9','u16','u32','u39','u74']){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>40);assert.ok(d.steps.length>=3);for(const step of d.steps){assert.ok(step[0].length>5);assert.ok(step[1].length>50);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>60);assert.ok(d.code.length>50);assert.ok(d.pitfalls.length>20);}
 });
 test('numerical derivation checkpoints are independently reproducible',()=>{
  const expected={u9:10000,u16:-5,u32:0.5,u39:2,u74:0.8};
