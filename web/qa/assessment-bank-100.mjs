@@ -35,6 +35,7 @@ try{
   const panel=page.locator('.assessment-readiness');
   assert.ok(await panel.locator('.assessment-path-row').count()>0,'missing course mapping: '+id);
   assert.equal(await page.locator('.sample-panel').count(),1,'missing structured public samples: '+id);
+  await page.locator('.sample-io').first().waitFor({state:'visible',timeout:5000});
   assert.ok(await page.locator('.sample-io').count()>=2,'missing input/expected output pair: '+id);
   assert.equal(await page.getByRole('button',{name:'运行公开样例'}).count(),1,'missing sample-run action: '+id);
   assert.equal(await page.getByRole('button',{name:'提交完整测试集'}).count(),1,'missing full-submit action: '+id);
