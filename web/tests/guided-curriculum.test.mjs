@@ -82,6 +82,7 @@ test('oral defense bank covers core research internship topics with follow-up ch
  for(const id of expected){const bank=INTERVIEW_BANK[id];assert.ok(bank,id+' interview bank missing');assert.ok(GUIDES[id]);assert.ok(bank.questions.length>=2);for(const q of bank.questions){assert.ok(q.prompt.length>12);assert.ok(q.followups.length>=3);assert.ok(q.points.length>=3);assert.ok(q.pitfalls.length>=1);}}
 });
 
+test('all four research routes include a scoped capstone and measurable acceptance criteria',()=>{for(const route of ROUTES){assert.ok(route.capstone,route.id);assert.ok(route.capstone.brief.length>30);assert.ok(route.capstone.evidence.length>20);assert.ok(route.capstone.acceptance.length>20);}});
 test('every course has a research oral-examination entry or a tailored fallback',()=>{
  for(const g of GUIDE_LIST){const bank=INTERVIEW_BANK[g.id];if(bank){assert.ok(bank.questions.length>=1);for(const q of bank.questions)assert.ok(q.followups.length>=3);}else{assert.ok(g.worked.question.length>10);assert.ok(g.boundary.length>10);assert.ok(g.transfer.length>10);}}
 });
