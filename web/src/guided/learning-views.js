@@ -6,6 +6,8 @@ import './learning.css';
 import {PRACTICE_LADDERS} from './practice-ladders.js';
 import {INTERVIEW_BANK} from './interview-bank.js';
 import {DERIVATION_LABS} from './derivation-labs.js';
+import {EXPERIMENT_PACKS} from './experiment-packs.js';
+import {RESEARCH_SOURCE_MAP} from './research-source-map.js';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
 const e=(tag,text='',cls='')=>{const n=document.createElement(tag);if(text!==null)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -78,6 +80,8 @@ function lessonIntro(ctx,c,g,p){
  out.append(callout('先过小例子，再做实现：本节不要求第一次就完成论文级实验。研究延伸留在第五阶段。','ok'));
  out.append(group('actions',button('进入讲解与例题',()=>setStage(ctx,c.id,1),'primary'),button('先浏览独立实现要求',()=>setStage(ctx,c.id,3)),button('加入周计划',()=>plan(ctx,c.id,0))));return out;
 }
+function renderSourceMap(out,id){const map=RESEARCH_SOURCE_MAP[id];if(!map)return;out.append(title('论文—源码对照 · '+map.title));for(const paper of map.papers){const card=group('learn-reference-card');card.append(e('h4',paper.title),e('p',paper.authors+' · '+paper.venue,'muted'),richText('核心主张：'+paper.claim),richText('建议追踪：'+paper.focus),safeLink('阅读论文 / 官方文档',paper.paper));if(paper.code?.length){const links=group('learn-source-links');for(const [label,url] of paper.code)links.append(safeLink(label,url));card.append(links);}out.append(card);}}
+function renderExperimentPacks(out,id){const packs=EXPERIMENT_PACKS.filter(x=>x.courses.includes(id));if(!packs.length)return;out.append(title('可运行研究实验包'));for(const pack of packs){const card=group('learn-reference-card');card.append(e('h4',pack.title),richText(pack.summary),richText('预期检查：'+pack.expected),callout('实验边界：'+pack.scope,'neutral'));const a=e('a','下载 Python 实验脚本');a.href='/experiments/'+pack.script;a.download=pack.script;card.append(a,safeLink('查看实验包说明与环境配置','/experiments/README.md'));out.append(card);}}
 function lessonExplain(ctx,c,g,p){
  const out=group('learn-stage-content'),lesson=ctx.lessons[c.id];
  out.append(title('先用一个能核对的小例子理解'),richText(g.worked.question));
@@ -90,6 +94,7 @@ function lessonExplain(ctx,c,g,p){
  if(lesson?.formula)out.append(richText(lesson.formula,'div','learn-equation'));
  if(lesson){for(const [i,s]of lesson.sections.entries()){out.append(details(s[0],[richText(s[1])],i===0));}}
  const derivation=DERIVATION_LABS[c.id];if(derivation){out.append(title('数学推导实验室'),callout(derivation.purpose,'neutral'),callout('适用假设：'+derivation.assumptions,'neutral'));for(const [i,step]of derivation.steps.entries())out.append(details(step[0],[richText(step[1],'div','learn-prose')],i===0));out.append(checkWidget(ctx,c.id,'derivation-check',derivation.checkpoint.question,derivation.checkpoint.answer,derivation.checkpoint.insight));out.append(details('把推导变成可验证实验',[richText(derivation.experiment),richText('代码任务：'+derivation.code),callout('常见误区：'+derivation.pitfalls,'warn')],false));}
+ renderSourceMap(out,c.id);
  out.append(title('理解检查：先口头解释，再写下依据'));
  const qs=lesson?.questions||[];qs.forEach((q,i)=>out.append(richText((i+1)+'. '+q,'p')));
  out.append(title('原始资料'),...(lesson?.links||[]).map(([name,url])=>group('learn-reference',safeLink(name,url))));
@@ -97,7 +102,7 @@ function lessonExplain(ctx,c,g,p){
  out.append(group('actions',button('进入带提示练习',()=>setStage(ctx,c.id,2),'primary'),button('返回入口',()=>setStage(ctx,c.id,0))));return out;
 }
 function lessonPractice(ctx,c,g,p){
- const out=group('learn-stage-content');out.append(title('这一小步具体做什么'),richText(g.guided.fixture),title('接口或交付骨架'));const derivation=DERIVATION_LABS[c.id];if(derivation)out.append(details('研究级实现任务：把推导写成代码',[richText('实现要求：'+derivation.code),richText('验证实验：'+derivation.experiment),callout('重点检查：'+derivation.pitfalls,'warn')],true));
+ const out=group('learn-stage-content');out.append(title('这一小步具体做什么'),richText(g.guided.fixture),title('接口或交付骨架'));const derivation=DERIVATION_LABS[c.id];if(derivation)out.append(details('研究级实现任务：把推导写成代码',[richText('实现要求：'+derivation.code),richText('验证实验：'+derivation.experiment),callout('重点检查：'+derivation.pitfalls,'warn')],true));renderExperimentPacks(out,c.id);
  const pre=e('pre',null,'learn-code');pre.append(e('code',g.guided.signature));out.append(pre);
  const ladder=PRACTICE_LADDERS[c.id];if(ladder){out.append(title(ladder.title),richText(ladder.intro));for(const [i,step]of ladder.steps.entries()){const content=[richText(step.objective),richText('实现要求：'+step.method)];if(step.input!==undefined){content.push(e('p','示例输入','muted'),e('pre',JSON.stringify(step.input,null,2),'code-output'),e('p','预期结果','muted'),e('pre',JSON.stringify(step.expected,null,2),'code-output'));}for(const id of step.tasks||[]){const task=ctx.problems.find(x=>x.id===id);if(task)content.push(button('打开对应自动评测：'+task.title,()=>ctx.openTask(id)));}out.append(details(step.title,content,i===0));}}else{out.append(title('本节的三步实现训练'),details('第 1 步｜读懂输入输出契约',[richText(g.guided.fixture),richText('先写清每个输入字段的含义、维度/单位、返回值结构，以及至少一个边界输入。')],true),details('第 2 步｜实现核心机制',[richText(g.guided.signature),richText(g.guided.hints[0]),richText(g.guided.hints[1])]),details('第 3 步｜反例与独立变式',[richText(g.independent),richText('再使用第三层提示检查边界：'+g.guided.hints[2]),richText('提交时记录实际输入、输出、复杂度和一个失败样例。')]));}
  out.append(group('actions',button('复制骨架',async()=>{try{await navigator.clipboard.writeText(g.guided.signature);ctx.notify('已复制');}catch{ctx.notify('浏览器未允许复制，请手动选择代码');}}),button('导出本节任务说明',()=>downloadTask(c,g)),button('加入周计划',()=>plan(ctx,c.id,2))));
@@ -128,10 +133,12 @@ function interviewPractice(ctx,c,p){
   card.append(e('span','ORAL DEFENSE · '+q.id,'interview-kicker'),e('h4',q.prompt),title('连续追问'));
   const follow=group('interview-followups');q.followups.forEach((x,i)=>follow.append(e('p',(i+1)+'. '+x)));card.append(follow);
   const answer=field('我的口头回答 / 推导 / 例子',old.answer||'');answer.input.rows=5;answer.input.placeholder='先给结论，再给推导依据、适用条件和验证方式。';card.append(answer.label);
+  const transcript=field('AI 追问记录与下一轮回答',old.transcript||'');transcript.input.rows=4;transcript.input.placeholder='把 ChatGPT 上一轮追问和你的回答按轮次粘贴在这里；下一轮会基于整段记录继续追问。';card.append(transcript.label);
   const pressure=e('p','尚未抽取追问。先完整回答主问题，再开始模拟追问。','muted');card.append(group('actions',button('模拟老师追问',()=>{pressure.textContent='老师追问：'+q.followups[Math.floor(Math.random()*q.followups.length)];},'secondary')),pressure);
   const status=e('p',old.practicedAt?'上次练习：'+new Date(old.practicedAt).toLocaleString('zh-CN')+' · 自述记录，尚未经过人工评分':'尚未记录口头练习','muted');
-  const reviewPrompt=()=>['你是顶级高校AI/机器人实验室的科研面试老师。请严格评估以下回答，不要因为术语多就给高分。','【课程】'+c.title,'【主问题】'+q.prompt,'【连续追问】'+q.followups.join('；'),'【我的回答】'+answer.input.value,'【参考考察点】'+q.points.join('；'),'【常见失分点】'+q.pitfalls.join('；'),'请按准确性、推导深度、假设与边界、工程/科研联系、表达清晰度分别按0-5分评分；指出错误或缺失；给出更好的回答结构；最后提出一个最值得继续追问的问题。证据不足时请明确说明，不要臆测。'].join('\\n\\n');
-  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary'),button('复制给 ChatGPT 评估',async()=>{if(!answer.input.value.trim()){ctx.notify('先写下你的回答');return;}try{await navigator.clipboard.writeText(reviewPrompt());ctx.notify('评估材料已复制，粘贴到 ChatGPT 对话即可由我逐项评估。');}catch{ctx.notify('浏览器未允许复制，请手动复制回答后发给 ChatGPT。');}},'secondary')));card.append(status);
+  const reviewPrompt=()=>['你是顶级高校AI/机器人实验室的科研面试老师。请严格评估以下回答，不要因为术语多就给高分。','【课程】'+c.title,'【主问题】'+q.prompt,'【连续追问】'+q.followups.join('；'),'【我的回答】'+answer.input.value,'【此前追问记录】'+transcript.input.value,'【参考考察点】'+q.points.join('；'),'【常见失分点】'+q.pitfalls.join('；'),'请按准确性、推导深度、假设与边界、工程/科研联系、表达清晰度分别按0-5分评分；指出具体错误或缺失；给出更好的回答结构；最后提出一个最值得继续追问的问题。证据不足时请明确说明，不要臆测。'].join('\\n\\n');
+  const dynamicPrompt=()=>['你正在模拟顶级高校 AI/机器人实验室的真实科研面试。不要给用户完整答案，也不要一次抛出多个问题。','【课程】'+c.title,'【主问题】'+q.prompt,'【本轮回答】'+answer.input.value,'【已有追问与回答记录】'+transcript.input.value,'【考察重点】'+q.points.join('；'),'【常见失分点】'+q.pitfalls.join('；'),'请先在内部判断用户最新回答中最薄弱、最值得验证的一处：可能是数学推导跳步、概念混淆、隐含假设、边界遗漏、实验设计漏洞或源码理解不准确。然后只提出一个具体、可回答、能区分真实理解与背诵的追问。追问必须紧扣用户刚才的回答，不要重复题库原问题，不要提前给提示或标准答案。若回答已扎实，则提高难度，要求构造反例、推导 Jacobian/复杂度、解释源码数据流或设计可证伪实验。输出格式：一句简短面试官反馈 + 一个追问。'].join('\\n\\n');
+  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,transcript:transcript.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary'),button('复制给 ChatGPT 评估',async()=>{if(!answer.input.value.trim()){ctx.notify('先写下你的回答');return;}try{await navigator.clipboard.writeText(reviewPrompt());ctx.notify('评估材料已复制，粘贴到 ChatGPT 对话即可由我逐项评估。');}catch{ctx.notify('浏览器未允许复制，请手动复制回答后发给 ChatGPT。');}},'secondary'),button('复制 AI 动态追问',async()=>{if(!answer.input.value.trim()){ctx.notify('先回答主问题，再生成动态追问');return;}try{await navigator.clipboard.writeText(dynamicPrompt());ctx.notify('动态追问指令已复制。将其粘贴到 ChatGPT，得到一个针对当前回答的追问；再把追问和你的下一轮回答记入上方记录。');}catch{ctx.notify('浏览器未允许复制，请手动复制回答和追问记录。');}},'secondary')));card.append(status);
   card.append(details('展开参考回答要点（答完再看）',[title('回答应覆盖'),...q.points.map(x=>e('p','• '+x)),title('常见失分点'),...q.pitfalls.map(x=>callout(x,'warn'))],false));
   wrap.append(card);
  }

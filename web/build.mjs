@@ -21,6 +21,10 @@ for(const name of Object.keys(config.functions||{}))if(!name.includes('*'))await
 await fs.access('api/samples.js');
 await fs.access('src/guided/interview-bank.js');
 await fs.access('src/guided/derivation-labs.js');
+await fs.access('src/guided/experiment-packs.js');
+await fs.access('src/guided/research-source-map.js');
+await fs.access('experiments/README.md');
+await fs.access('experiments/requirements.txt');
 await fs.access('src/task-complexity.js');
 const tests=(await fs.readdir('tests')).filter(n=>n.endsWith('.test.mjs')).sort().map(n=>'tests/'+n);
 assert.ok(tests.length,'A release must include regression tests');
@@ -47,6 +51,8 @@ for(const id of [...ALGORITHMS,...ROS])assert.ok(taskIds.includes(id),'Missing u
 const courses=enrichCourses(original);
 assert.equal(new Set(courses.map(c=>c.practice)).size,96,'Practice tasks must not be identical generic text');
 await fs.mkdir('public',{recursive:true});
+await fs.rm('public/experiments',{recursive:true,force:true});
+await fs.cp('experiments','public/experiments',{recursive:true});
 const displayVersion=pkg.version.split('.').slice(0,2).join('.');
 const releaseLabel=`版本 ${displayVersion} · ${taskIds.length}道自动评测任务 · 分阶段学习与证据记录`;
 const publicHtml=html.replace(/版本\s+\d+\.\d+(?:\.\d+)?[^<]*/,releaseLabel);

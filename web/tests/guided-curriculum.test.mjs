@@ -16,6 +16,8 @@ import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 import {PRACTICE_LADDERS} from '../src/guided/practice-ladders.js';
 import {INTERVIEW_BANK} from '../src/guided/interview-bank.js';
 import {DERIVATION_LABS} from '../src/guided/derivation-labs.js';
+import {EXPERIMENT_PACKS} from '../src/guided/experiment-packs.js';
+import {RESEARCH_SOURCE_MAP} from '../src/guided/research-source-map.js';
 import {TASK_PATHS} from '../src/guided/assessment-path.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
 const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
@@ -110,4 +112,17 @@ test('five high-value courses include full mathematical derivations, assumptions
 test('numerical derivation checkpoints are independently reproducible',()=>{
  const expected={u9:10000,u16:-5,u32:0.5,u39:2,u74:0.8};
  for(const [id,value] of Object.entries(expected))assert.equal(Number(DERIVATION_LABS[id].checkpoint.answer),value,id);
+});
+
+test('five runnable research experiment packs map to the intended courses and real scripts',()=>{
+ const fs=require('node:fs');
+ assert.equal(EXPERIMENT_PACKS.length,5);
+ for(const pack of EXPERIMENT_PACKS){assert.ok(pack.courses.length>=2);assert.ok(pack.summary.length>30);assert.ok(pack.expected.length>20);assert.ok(pack.scope.length>30);assert.ok(fs.existsSync(new URL('../experiments/'+pack.script,import.meta.url)));}
+});
+test('paper-to-source maps cover the five research domains and link papers plus code',()=>{
+ for(const id of ['u10','u21','u33','u38','u39','u40','u41','u54','u61','u62','u75','u81']){const m=RESEARCH_SOURCE_MAP[id];assert.ok(m,id);assert.ok(m.papers.length>=1);for(const p of m.papers){assert.ok(p.paper.startsWith('https://'));assert.ok(p.focus.length>35);assert.ok(p.code.length>=1);for(const [label,url] of p.code){assert.ok(label.length>3);assert.ok(url.startsWith('https://')||url.startsWith('/experiments/'));}}}
+});
+test('research interview cards support transcript-based dynamic followup prompts',()=>{
+ const source=fs.readFileSync(new URL('../src/guided/learning-views.js',import.meta.url),'utf8');
+ assert.match(source,/AI 动态追问/);assert.match(source,/已有追问与回答记录/);assert.match(source,/只提出一个具体/);
 });

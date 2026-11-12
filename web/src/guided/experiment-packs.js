@@ -1,0 +1,7 @@
+export const EXPERIMENT_PACKS=[
+{id:'bayes-optimization',title:'贝叶斯推断与优化',courses:['u10','u16','u21'],script:'01_bayes_and_optimization.py',summary:'用高斯共轭模型核对后验均值/方差，再观察梯度下降如何收敛到 MAP。',expected:'posterior_mean=2.400000；posterior_variance=0.800000；梯度下降误差应接近 0。',scope:'合成标量模型；不代表神经网络后验可解析求解，也不构成深度网络收敛证明。'},
+{id:'multiview',title:'多视图几何与三角化',courses:['u32','u33','u38'],script:'02_multiview_geometry.py',summary:'从已知相机内外参生成两视图观测，计算极约束残差、DLT 三角化与深度误差。',expected:'极约束残差较小；三角化重投影误差与深度误差随像素噪声和视差变化。',scope:'已知位姿与正确匹配的合成双目实验，不是完整 SfM 或鲁棒匹配系统。'},
+{id:'pointcloud',title:'点云配准与鲁棒 ICP',courses:['u39','u40','u41'],script:'03_pointcloud_registration.py',summary:'对含噪声和离群点的点云执行 trimmed ICP，记录旋转误差、平移误差与收敛曲线。',expected:'旋转误差、平移误差和 trimmed RMSE 应随迭代下降并保持有限。',scope:'合成点云与近似初值的教学基线，不等同 KISS-ICP、GICP 或完整 SLAM。'},
+{id:'slam-factor-graph',title:'SLAM 因子图与 Gauge Freedom',courses:['u74','u75','u81'],script:'04_slam_factor_graph.py',summary:'对比纯里程计与加入回环约束后的轨迹，检查未固定参考位姿时的秩亏。',expected:'unanchored gauge_nullity=1；固定首位姿后优化轨迹通常优于原始里程计。',scope:'一维位姿图教学模型，用于理解漂移和 gauge；不是 SE(3) 或 IMU 预积分完整实现。'},
+{id:'transformer-attention',title:'Transformer、CLIP 与高效注意力',courses:['u54','u61','u62'],script:'05_transformer_attention.py',summary:'对比标准 Attention 与在线 Softmax 分块计算，并核对 InfoNCE 对 logits 的梯度。',expected:'分块 Attention 与标准结果最大绝对误差应处于浮点容差范围；InfoNCE 梯度满足 p−y。',scope:'NumPy 数值实验，不测 GPU kernel 性能；FlashAttention 的算术复杂度仍是二次序列交互。'}
+];
