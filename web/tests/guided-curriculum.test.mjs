@@ -88,6 +88,11 @@ test('every course has a research oral-examination entry or a tailored fallback'
  for(const g of GUIDE_LIST){const bank=INTERVIEW_BANK[g.id];if(bank){assert.ok(bank.questions.length>=1);for(const q of bank.questions)assert.ok(q.followups.length>=3);}else{assert.ok(g.worked.question.length>10);assert.ok(g.boundary.length>10);assert.ok(g.transfer.length>10);}}
 });
 
+test('derivation lab equations parse and include substantive mathematical notation',()=>{
+ for(const [id,d] of Object.entries(DERIVATION_LABS)){
+  for(const step of d.steps){const result=validateMath(step[1]);assert.deepEqual(result.errors,[],id+' '+step[0]);assert.ok(result.count>=1,id+' '+step[0]+' should render equations');}
+ }
+});
 test('five high-value courses include full mathematical derivations, assumptions, numerical checks and experiments',()=>{
  for(const id of ['u9','u16','u32','u39','u74']){const d=DERIVATION_LABS[id];assert.ok(d,id);assert.ok(d.assumptions.length>40);assert.ok(d.steps.length>=3);for(const step of d.steps){assert.ok(step[0].length>5);assert.ok(step[1].length>100);}assert.ok(d.checkpoint.question.length>20);assert.ok(d.checkpoint.answer.length>0);assert.ok(d.experiment.length>80);assert.ok(d.code.length>50);assert.ok(d.pitfalls.length>20);}
 });
