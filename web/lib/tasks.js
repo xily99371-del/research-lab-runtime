@@ -94,7 +94,7 @@ function randomInput(id){
  throw new Error('No random generator for '+id);
 }
 export function suite(id){if(HOT_IDS.includes(id))return suiteHot(id);if(EXPANDED_IDS.includes(id))return expandedSuite(id);const base=cases[id];if(!base)throw new Error('No test suite');const out=base.map((input,i)=>({input,public:i<2,expected:reference(id,input)}));for(let i=0;i<12;i++){const input=randomInput(id);out.push({input,public:false,expected:reference(id,input)});}return out;}
-export function publicSuite(id){if(ROS.includes(id))return [];return suite(id).filter(t=>t.public).map((t,i)=>({name:'公开样例 '+(i+1),input:t.input,expected:t.expected}));}
+export function publicSuite(id){if(ROS.includes(id))return [];return suite(id).filter(t=>t.public).map((t,i)=>({public:true,name:'公开样例 '+(i+1),input:t.input,expected:t.expected}));}
 export function matches(id,d,a,e){
  if(HOT_IDS.includes(id))return matchesHot(id,d,a,e);
  if(EXPANDED_IDS.includes(id))return matchesAdvanced(id,d,a,e);

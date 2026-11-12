@@ -37,7 +37,7 @@ test('all mapped task routes point to actual existing course IDs',()=>{
 });
 
 test('public sample API source contains only explicit public cases',()=>{
- for(const id of ALGORITHMS){const samples=publicSuite(id);assert.ok(samples.length>=1,id+' has no public sample');assert.ok(samples.every(x=>x.name.startsWith('公开样例')&&x.input!==undefined&&Object.hasOwn(x,'expected')),id);}
+ for(const id of ALGORITHMS){const samples=publicSuite(id);assert.ok(samples.length>=1,id+' has no public sample');assert.ok(samples.every(x=>x.public===true&&x.name.startsWith('公开样例')&&x.input!==undefined&&Object.hasOwn(x,'expected')),id);}
  for(const id of ROS)assert.deepEqual(publicSuite(id),[]);
 });
 test('graph search readiness includes the required data-structure and graph units',()=>{
