@@ -22,3 +22,6 @@
 .interview-followups{padding:10px 13px;background:#f2f6fa;border-radius:9px}
 .interview-followups p{margin:5px 0;font-size:13px;line-height:1.65}
 .interview-question textarea{min-height:120px}
+
+.interview-question .actions{display:flex;flex-wrap:wrap;gap:8px}
+.interview-question .actions button{font-size:12px}

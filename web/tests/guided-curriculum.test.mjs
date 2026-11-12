@@ -81,3 +81,7 @@ test('oral defense bank covers core research internship topics with follow-up ch
  const expected=["u16","u32","u33","u37","u39","u41","u49","u54","u55","u72","u74","u75","u76","u85","u86","u87"];
  for(const id of expected){const bank=INTERVIEW_BANK[id];assert.ok(bank,id+' interview bank missing');assert.ok(GUIDES[id]);assert.ok(bank.questions.length>=2);for(const q of bank.questions){assert.ok(q.prompt.length>12);assert.ok(q.followups.length>=3);assert.ok(q.points.length>=3);assert.ok(q.pitfalls.length>=1);}}
 });
+
+test('every course has a research oral-examination entry or a tailored fallback',()=>{
+ for(const g of GUIDE_LIST){const bank=INTERVIEW_BANK[g.id];if(bank){assert.ok(bank.questions.length>=1);for(const q of bank.questions)assert.ok(q.followups.length>=3);}else{assert.ok(g.worked.question.length>10);assert.ok(g.boundary.length>10);assert.ok(g.transfer.length>10);}}
+});

@@ -118,7 +118,7 @@ function lessonIndependent(ctx,c,g,p){
  out.append(group('actions',button('进入迁移与复习',()=>setStage(ctx,c.id,4),'primary'),button('回到带提示练习',()=>setStage(ctx,c.id,2))));return out;
 }
 function interviewPractice(ctx,c,p){
- const bank=INTERVIEW_BANK[c.id];if(!bank)return null;
+ const g=GUIDES[c.id],bank=INTERVIEW_BANK[c.id]||{title:c.title,questions:[{id:'core',prompt:g.worked.question,followups:['这个结论依赖哪些前提？如果其中一个前提不成立，会发生什么？','请把核心关系从公式、伪代码或最小数值例子推导出来。','构造一个边界情况或反例，并说明你会怎样验证。','如果用于科研项目，最可能遇到什么失效场景？'],points:[g.worked.insight,g.guided.fixture,g.boundary,g.transfer],pitfalls:['只复述定义，不能给出推导、反例或验证方案','没有说明适用条件和失败边界']}]};
  const wrap=group('interview-practice');
  wrap.append(title('科研面试拷问 · '+bank.title),callout('建议先离开屏幕，用 1–2 分钟口头回答主问题，再展开追问。回答应落到公式、代码、实验或反例；参考要点用于复盘，不是背诵稿。','neutral'));
  for(const q of bank.questions){
@@ -126,8 +126,10 @@ function interviewPractice(ctx,c,p){
   card.append(e('span','ORAL DEFENSE · '+q.id,'interview-kicker'),e('h4',q.prompt),title('连续追问'));
   const follow=group('interview-followups');q.followups.forEach((x,i)=>follow.append(e('p',(i+1)+'. '+x)));card.append(follow);
   const answer=field('我的口头回答 / 推导 / 例子',old.answer||'');answer.input.rows=5;answer.input.placeholder='先给结论，再给推导依据、适用条件和验证方式。';card.append(answer.label);
+  const pressure=e('p','尚未抽取追问。先完整回答主问题，再开始模拟追问。','muted');card.append(group('actions',button('模拟老师追问',()=>{pressure.textContent='老师追问：'+q.followups[Math.floor(Math.random()*q.followups.length)];},'secondary')),pressure);
   const status=e('p',old.practicedAt?'上次练习：'+new Date(old.practicedAt).toLocaleString('zh-CN')+' · 自述记录，尚未经过人工评分':'尚未记录口头练习','muted');
-  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary')));card.append(status);
+  const reviewPrompt=()=>['你是顶级高校AI/机器人实验室的科研面试老师。请严格评估以下回答，不要因为术语多就给高分。','【课程】'+c.title,'【主问题】'+q.prompt,'【连续追问】'+q.followups.join('；'),'【我的回答】'+answer.input.value,'【参考考察点】'+q.points.join('；'),'【常见失分点】'+q.pitfalls.join('；'),'请按准确性、推导深度、假设与边界、工程/科研联系、表达清晰度分别按0-5分评分；指出错误或缺失；给出更好的回答结构；最后提出一个最值得继续追问的问题。证据不足时请明确说明，不要臆测。'].join('\\n\\n');
+  card.append(group('actions',button('保存我的回答',()=>{if(!answer.input.value.trim()){ctx.notify('先写下回答或口头表达提纲');return;}edit(ctx,c.id,x=>{x.interviewAnswers||={};x.interviewAnswers[q.id]={answer:answer.input.value,practicedAt:new Date().toISOString()};});status.textContent='已保存练习记录；系统不会把自述回答自动判定为掌握。';ctx.notify('面试回答已保存')},'primary'),button('复制给 ChatGPT 评估',async()=>{if(!answer.input.value.trim()){ctx.notify('先写下你的回答');return;}try{await navigator.clipboard.writeText(reviewPrompt());ctx.notify('评估材料已复制，粘贴到 ChatGPT 对话即可由我逐项评估。');}catch{ctx.notify('浏览器未允许复制，请手动复制回答后发给 ChatGPT。');}},'secondary')));card.append(status);
   card.append(details('展开参考回答要点（答完再看）',[title('回答应覆盖'),...q.points.map(x=>e('p','• '+x)),title('常见失分点'),...q.pitfalls.map(x=>callout(x,'warn'))],false));
   wrap.append(card);
  }

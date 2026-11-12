@@ -117,7 +117,7 @@ function loadPublicSamples(taskId,panel){
 }
 function renderCode(root){
  root.append(hero('任务中心：按知识路径逐级训练。','从高频基础题到真实AI、视觉与机器人模块；每道题都有明确应用背景、分级目标和自动测试。'));
- root.append(box('actions',btn('自动评测任务（'+PROBLEMS.length+'）',()=>{taskMode='code';render();},taskMode==='code'?'primary':''),btn('课程实践任务（'+courses.length+'）',()=>{taskMode='project';render();},taskMode==='project'?'primary':'')));
+ root.append(note('按递进路径完成自动评测；数学推导、开放实践和面试训练均从对应课程进入，避免重复维护两套课程目录。'));if(taskMode==='project')taskMode='code';
  if(taskMode==='project'){renderLearningPractice(root,context());return;}
  const filter=(values,current,label,callback)=>{const s=el('select');s.setAttribute('aria-label',label);for(const value of values){const o=el('option',value);s.append(o);}s.value=current;s.onchange=()=>{callback(s.value);render();};return s;};
  const search=el('input');search.id='code-search';search.placeholder='搜索题目、输入输出或概念';search.value=taskQuery;const searchUpdate=e=>{if(e.isComposing)return;taskQuery=search.value;rerenderWithFocus('code-search');};search.oninput=searchUpdate;search.oncompositionend=searchUpdate;
