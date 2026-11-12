@@ -39,4 +39,4 @@ export const EXACT_LINKS={
  u80:['path_length'],
  u86:['paired_mean_difference']
 };
-export function enrichCourses(courses){return courses.map(c=>{const g=GUIDES[c.id];if(!g)throw Error('Missing guide '+c.id);return {...c,prerequisites:g.prerequisites,learningGoal:g.goal,practice:g.guided.signature+'\n'+g.guided.fixture+'\n独立实现：'+g.independent,mastery:'课堂核对、带提示练习、独立实现证据与迁移证据分别记录；不以勾选代替验收。',deliverable:g.evidence.join('；'),taskIds:EXACT_LINKS[c.id]||[],instructionalStatus:'staged-learning-v1'};});}
+export function enrichCourses(courses){return courses.map(c=>{const g=GUIDES[c.id];if(!g)throw Error('Missing guide '+c.id);return {...c,summary:g.goal,prerequisites:g.prerequisites,learningGoal:g.goal,practice:[g.guided.signature,'验收样例：'+g.guided.fixture,'独立实现：'+g.independent,'边界检查：'+g.boundary].join('\n\n'),mastery:'能够解释核心假设，独立实现接口，并用边界样例和迁移任务验证结论。',deliverable:[...g.evidence,'独立实现：'+g.independent,'迁移验证：'+g.transfer,'适用边界：'+g.boundary].join('；'),taskIds:EXACT_LINKS[c.id]||[],instructionalStatus:'staged-learning-v2'};});}

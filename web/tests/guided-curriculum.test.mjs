@@ -9,18 +9,33 @@ import {LESSONS} from '../src/lessons.js';
 import {ADVANCED_LESSONS} from '../src/advanced-lessons.js';
 import {REMAINING_LESSONS} from '../src/remaining-lessons.js';
 import {ROS_MIDDLEWARE_LESSON} from '../src/ros-middleware-lesson.js';
+import {DEEP_LESSONS} from '../src/deep-lessons.js';
+import {DEEP_LESSONS_ADVANCED} from '../src/deep-lessons-advanced.js';
+import {DEEP_LESSONS_SYSTEMS} from '../src/deep-lessons-systems.js';
+import {VERIFICATION} from '../src/guided/verification.js';
 import {LEGACY_LESSON_FORMULAS} from '../src/lesson-formulas.js';
 import {PROBLEMS} from '../src/problems.js';
 import {EXPANDED_PROBLEMS} from '../src/expanded-problems.js';
 import {HOT_PROBLEMS} from '../src/hot100-problems.js';
 const courses=JSON.parse(fs.readFileSync(new URL('../data/courses.json',import.meta.url),'utf8'));
-const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON};
+const sourceLessonGroups=[LESSONS,ADVANCED_LESSONS,REMAINING_LESSONS,ROS_MIDDLEWARE_LESSON];
+const sourceIds=new Set();for(const source of sourceLessonGroups)for(const id of Object.keys(source)){assert.ok(!sourceIds.has(id),'duplicate raw lesson definition: '+id);sourceIds.add(id);}
+const deepLessons={...DEEP_LESSONS,...DEEP_LESSONS_ADVANCED,...DEEP_LESSONS_SYSTEMS};
+const lessons={...LESSONS,...ADVANCED_LESSONS,...REMAINING_LESSONS,...ROS_MIDDLEWARE_LESSON,...deepLessons};
 
 test('all 96 existing IDs have unique worked examples, fixtures, independent and transfer tasks',()=>{
  assert.equal(GUIDE_LIST.length,96);assert.equal(Object.keys(GUIDES).length,96);
  for(const c of courses){const g=GUIDES[c.id];assert.ok(g,c.id);assert.ok(g.worked.steps.length>=3);assert.equal(g.guided.hints.length,3);for(const x of [g.goal,g.worked.question,g.guided.signature,g.guided.fixture,g.independent,g.transfer,g.boundary])assert.ok(x.length>=10,c.id);assert.ok(checkAnswer(g.worked.answer,g.worked.answer));assert.equal(checkAnswer('',g.worked.answer),false);}
  for(const getter of [g=>g.worked.question,g=>g.guided.fixture,g=>g.independent,g=>g.transfer])assert.equal(new Set(GUIDE_LIST.map(getter)).size,96);
  const enriched=enrichCourses(courses);assert.deepEqual(enriched.map(x=>x.id),courses.map(x=>x.id));assert.equal(new Set(enriched.map(x=>x.practice)).size,96);
+});
+test('deep lessons provide derivations, assumptions and implementation context',()=>{
+ assert.ok(Object.keys(deepLessons).length>=15);
+ for(const [id,l] of Object.entries(deepLessons)){assert.ok(GUIDES[id],id);assert.ok(l.formula&&l.formula.length>10,id);assert.ok(l.sections.length>=5,id);const chars=l.sections.reduce((n,s)=>n+s[1].length,0);assert.ok(chars>=500,id+': '+chars);assert.ok(l.questions.length>=3,id);}
+});
+test('guided code exercises include copyable acceptance cases',()=>{
+ assert.ok(Object.keys(VERIFICATION).length>=12);
+ for(const [id,cases] of Object.entries(VERIFICATION)){assert.ok(GUIDES[id],id);assert.ok(cases.length>=2,id);for(const item of cases){assert.ok(item.label.length>2,id);assert.ok(item.purpose.length>8,id);assert.ok(item.code.length>12,id);}}
 });
 test('prerequisite graph is acyclic and routes only reference valid course IDs',()=>{
  const done=new Set(),active=new Set();function dfs(id){if(done.has(id))return;assert.ok(GUIDES[id],'invalid prerequisite '+id);assert.ok(!active.has(id),'cycle '+id);active.add(id);for(const p of GUIDES[id].prerequisites)dfs(p);active.delete(id);done.add(id);}for(const c of courses)dfs(c.id);

@@ -2,6 +2,7 @@ import {GUIDES,EXACT_LINKS,enrichCourses} from './catalog.js';
 import {STAGES,ROUTES,checkAnswer,progressFor,learnerStatus,nextUnit} from './model.js';
 import {richText} from './math.js';
 import {taskReadiness,TASK_PATHS} from './assessment-path.js';
+import {VERIFICATION} from './verification.js';
 import './learning.css';
 
 const ui={course:'u1',track:'全部',query:'',practiceQuery:'',practiceTrack:'全部'};
@@ -59,8 +60,10 @@ function readinessCard(ctx,task){
  else wrap.append(callout('已达到建议起点。开始评测后，测试失败也可以回到对应课程补习，不需要从头重学。','ok'));
  return wrap;
 }
-function taskLinks(ctx,id){const ps=linkedTasks(ctx,id),wrap=group('learn-links');
- if(ps.length){wrap.append(title('这节课对应的自动评测'));for(const p of ps)wrap.append(readinessCard(ctx,p));wrap.append(e('p','自动评测验证程序行为；课程实践还会检查独立实现与研究迁移，两类证据不会互相替代。','muted'));}
+function taskLinks(ctx,id){const ps=linkedTasks(ctx,id),wrap=group('learn-links'),primary=new Set(EXACT_LINKS[id]||[]),core=ps.filter(p=>primary.has(p.id)),related=ps.filter(p=>!primary.has(p.id));
+ if(core.length){wrap.append(title('本课核心自动评测'));for(const p of core)wrap.append(readinessCard(ctx,p));}
+ if(related.length)wrap.append(details('还会用到本课知识的拓展评测（'+related.length+'题）',related.map(p=>readinessCard(ctx,p))));
+ if(ps.length)wrap.append(e('p','核心评测直接检查本课对应的程序行为；拓展评测会把本课作为先修知识。自动测试、独立实现与研究迁移分别记录。','muted'));
  else wrap.append(callout('本节目前没有独立在线判题。请按课程接口、样例和交付要求完成开放实践；不要把自评记录当作自动评分。','neutral'));
  return wrap;
 }
@@ -89,6 +92,7 @@ function lessonExplain(ctx,c,g,p){
  out.append(title('理解检查：先口头解释，再写下依据'));
  const qs=lesson?.questions||[];qs.forEach((q,i)=>out.append(richText((i+1)+'. '+q,'p')));
  out.append(title('原始资料'),...(lesson?.links||[]).map(([name,url])=>group('learn-reference',safeLink(name,url))));
+ if(lesson?.tasks?.length){out.append(title('课程实验与实现任务'));lesson.tasks.forEach((task,i)=>{const body=Array.isArray(task)?task.map(String).join('\n'):String(task);out.append(details('实验任务 '+(i+1),[richText(body)],i===0));});}
  const f=field('我的推导、疑问与说明',ctx.data.progress[c.id]?.note||'');f.input.oninput=()=>{ctx.data.progress[c.id]={...ctx.data.progress[c.id],note:f.input.value};ctx.changed();};out.append(f.label);
  out.append(group('actions',button('进入带提示练习',()=>setStage(ctx,c.id,2),'primary'),button('返回入口',()=>setStage(ctx,c.id,0))));return out;
 }
@@ -96,6 +100,9 @@ function lessonPractice(ctx,c,g,p){
  const out=group('learn-stage-content');out.append(title('这一小步具体做什么'),richText(g.guided.fixture),title('接口或交付骨架'));
  const pre=e('pre',null,'learn-code');pre.append(e('code',g.guided.signature));out.append(pre);
  out.append(group('actions',button('复制骨架',async()=>{try{await navigator.clipboard.writeText(g.guided.signature);ctx.notify('已复制');}catch{ctx.notify('浏览器未允许复制，请手动选择代码');}}),button('导出本节任务说明',()=>downloadTask(c,g)),button('加入周计划',()=>plan(ctx,c.id,2))));
+ const checks=VERIFICATION[c.id]||[];
+ if(checks.length){out.append(title('本地代码验收用例'));for(const item of checks){const card=group('learn-verification');card.append(e('strong',item.label),e('p',item.purpose,'muted'));if(item.language)card.append(e('small',item.language.toUpperCase(),'muted'));const test=e('pre',null,'learn-code');test.append(e('code',item.code));card.append(test);out.append(card);}}
+ else out.append(callout('本节尚无专用断言模板。至少补齐：基准样例、边界/退化输入、随机小样本对拍；记录每项的预期输出与实际输出。','neutral'));
  out.append(title('卡住时逐层展开提示'));
  const revealed=Math.min(3,Number(p.hintsRevealed)||0);for(let i=0;i<revealed;i++)out.append(callout('提示'+(i+1)+'：'+g.guided.hints[i],''));
  out.append(button(revealed>=3?'三层提示均已展开':'展开第'+(revealed+1)+'层提示',()=>{if(revealed>=3)return;edit(ctx,c.id,x=>{x.hintsRevealed=revealed+1;});ctx.refresh();}));
@@ -147,7 +154,8 @@ export function renderLearningCourses(root,ctx){
  root.append(group('course-grid learn-layout',list,main));
 }
 function downloadTask(c,g){
- const text=['# '+c.title,'学习目标：'+g.goal,'前置：'+g.prerequisites.join(', '),'## 手算例题',g.worked.question,'## 接口',g.guided.signature,'## 验收样例',g.guided.fixture,'## 独立实现',g.independent,'## 迁移',g.transfer,'## 边界',g.boundary,'## 交付证据',...g.evidence].join('\n\n');
+ const checks=(VERIFICATION[c.id]||[]).flatMap(x=>['### '+x.label,x.purpose,'```'+(x.language||'python')+'\n'+x.code+'\n```']);
+ const text=['# '+c.title,'学习目标：'+g.goal,'前置：'+g.prerequisites.join(', '),'## 手算例题',g.worked.question,'## 接口',g.guided.signature,'## 验收样例',g.guided.fixture,'## 本地测试用例',...checks,'## 独立实现',g.independent,'## 迁移',g.transfer,'## 边界',g.boundary,'## 交付证据',...g.evidence].join('\n\n');
  const url=URL.createObjectURL(new Blob([text],{type:'text/markdown;charset=utf-8'})),a=e('a');a.href=url;a.download='research-lab-'+c.id+'-practice.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 export function renderLearningPractice(root,ctx){
