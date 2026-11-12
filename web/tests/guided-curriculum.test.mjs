@@ -115,8 +115,7 @@ test('numerical derivation checkpoints are independently reproducible',()=>{
 });
 
 test('course explanation illustrations map to the intended research courses and include Chinese captions',()=>{
- const fs=await import('node:fs');
- const source=fs.readFileSync(new URL('../src/guided/learning-views.js',import.meta.url),'utf8');
+  const source=fs.readFileSync(new URL('../src/guided/learning-views.js',import.meta.url),'utf8');
  assert.match(source,/function renderCourseIllustration/);
  for(const name of ['bayes-optimization','multiview-geometry','pointcloud-icp','slam-factor-graph','transformer-attention'])assert.ok(fs.existsSync(new URL('../public/illustrations/'+name+'.svg',import.meta.url)));
  assert.match(source,/先验与观测共同形成后验/);assert.match(source,/极约束用于检查匹配/);assert.match(source,/点云配准由对应关系/);
