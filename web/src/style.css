@@ -62,3 +62,7 @@ aside,nav{min-width:0}nav{max-width:100%}.layout{min-width:0}@media(max-width:80
  .task-focus-mode .task-run-actions{bottom:0;margin:8px 0;padding:8px;gap:6px}
  .task-focus-mode .task-run-actions button{font-size:10px;padding:8px 10px}
 }
+
+.task-focus-mode .task-detail>button{display:none!important}
+.task-focus-mode .sample-panel{margin-bottom:14px}
+.task-focus-mode .task-detail-intro{padding:6px 0}
