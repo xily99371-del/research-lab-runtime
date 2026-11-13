@@ -85,6 +85,7 @@ function render(){if(page!=='code')taskFocus=false;document.body.classList.toggl
 function navigate(p){if(page==='code'&&p!=='code')taskFocus=false;page=pages[p]?p:'dashboard';location.hash=page;render();}
 for(const b of document.querySelectorAll('nav button'))b.onclick=()=>navigate(b.dataset.page);
 window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(pages[p]&&p!==page){page=p;render();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&taskFocus){taskFocus=false;document.body.classList.remove('task-focus-mode');render();}});
 function openCourse(id){focusCourse(id);navigate('courses');}
 function openCourseStage(id,stage){
  focusCourse(id);

@@ -66,3 +66,14 @@ aside,nav{min-width:0}nav{max-width:100%}.layout{min-width:0}@media(max-width:80
 .task-focus-mode .task-detail>button{display:none!important}
 .task-focus-mode .sample-panel{margin-bottom:14px}
 .task-focus-mode .task-detail-intro{padding:6px 0}
+
+.task-focus-bar{width:100%;box-sizing:border-box;min-width:0}
+.task-focus-bar>*{min-width:0}
+.task-focus-bar>.task-focus-heading{flex:1 1 80px}
+.task-focus-bar>.actions{flex:0 1 auto;min-width:0}
+@media(max-width:700px){
+ .task-focus-bar{width:100%;box-sizing:border-box;min-width:0;flex-wrap:nowrap}
+ .task-focus-bar>.task-focus-heading{flex:1 1 65px;min-width:0}
+ .task-focus-bar>.actions{flex:0 0 auto;min-width:0;gap:3px}
+ .task-focus-bar button{min-width:0;white-space:nowrap;padding:6px 5px;font-size:9px}
+}
