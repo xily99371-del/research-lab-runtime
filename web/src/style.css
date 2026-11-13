@@ -91,3 +91,20 @@ aside,nav{min-width:0}nav{max-width:100%}.layout{min-width:0}@media(max-width:80
  .task-focus-bar>.task-focus-heading{flex:1 1 auto}
  .task-focus-bar>.actions{display:flex;flex:0 0 auto;gap:4px}
 }
+
+/* Focus mode: hide the actual semantic main header and pin the workspace to viewport */
+.task-focus-mode main{height:100dvh;min-height:0;overflow:hidden;padding:0;display:block}
+.task-focus-mode main>header{display:none!important}
+.task-focus-mode #page{display:block;height:100dvh;max-height:100dvh;overflow:hidden;padding:0;margin:0}
+.task-focus-mode .task-grid{height:100dvh;max-height:100dvh;overflow:hidden}
+.task-focus-mode .task-detail{height:100dvh;max-height:100dvh;box-sizing:border-box;overflow-y:auto}
+.task-focus-mode .task-focus-bar{left:auto;right:auto;margin:0 0 18px;width:100%;box-sizing:border-box}
+@media(max-width:700px){
+ .task-focus-mode .task-detail{padding:12px 12px 90px}
+ .task-focus-mode .task-focus-bar{margin:0 0 14px;width:100%;padding:9px 8px;gap:5px}
+ .task-focus-mode .task-focus-heading{min-width:0;flex:1 1 60px}
+ .task-focus-mode .task-focus-heading strong{max-width:100%;font-size:11px}
+ .task-focus-mode .task-focus-heading small{font-size:9px}
+ .task-focus-mode .task-focus-bar>.actions{flex:0 0 auto;gap:3px}
+ .task-focus-mode .task-focus-bar button{font-size:9px;padding:6px 5px}
+}
