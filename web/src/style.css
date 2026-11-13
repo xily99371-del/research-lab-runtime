@@ -108,3 +108,25 @@ aside,nav{min-width:0}nav{max-width:100%}.layout{min-width:0}@media(max-width:80
  .task-focus-mode .task-focus-bar>.actions{flex:0 0 auto;gap:3px}
  .task-focus-mode .task-focus-bar button{font-size:9px;padding:6px 5px}
 }
+
+/* Task center: direct LeetCode-like split workspace; all controls stay in normal flow */
+.task-grid{display:grid;grid-template-columns:minmax(300px,.88fr) minmax(0,1.12fr);gap:14px;align-items:start;width:100%;margin-top:14px;min-width:0}
+.task-problem-pane,.task-editor-pane{min-width:0;max-height:none;overflow:visible;padding:18px}
+.task-workspace-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:14px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.task-header-title{min-width:0}
+.task-header-title h2{font-size:20px;margin:9px 0 5px;line-height:1.4}
+.task-header-title p{font-size:11px;margin:0;color:var(--muted)}
+.task-workspace-header>.actions{flex:0 0 auto;display:flex;gap:6px}
+.task-picker-wrap{display:flex;align-items:center;gap:8px;margin-left:auto;min-width:220px}
+.task-picker-wrap label{font-size:11px;color:var(--muted);white-space:nowrap}
+.task-picker-wrap select{min-width:0;max-width:340px}
+.task-detail-intro{font-size:13px;line-height:1.8;color:#344b63;margin-bottom:14px}
+.task-problem-pane details{margin:10px 0}
+.task-editor-pane .task-editor-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+.task-editor-pane .task-editor-heading h3{margin:0}
+.task-editor-pane .editor{width:100%;box-sizing:border-box;min-height:58vh;height:58vh;max-height:850px;resize:vertical;padding:16px;background:#111e30;color:#e4edf8;border:1px solid #273d58;border-radius:10px;font:13px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:4}
+.task-editor-pane .task-run-actions{position:static;display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:0;background:transparent;border:0;box-shadow:none}
+.task-editor-pane .learn-code-result,.task-editor-pane .assessment-path-card{margin:12px 0}
+.task-editor-pane .task-collapsible{margin:10px 0}
+@media(max-width:1000px){.task-grid{grid-template-columns:minmax(0,1fr)}.task-problem-pane,.task-editor-pane{max-height:none}.task-editor-pane .editor{height:52vh;min-height:380px}}
+@media(max-width:640px){.task-workspace-header{align-items:flex-start;flex-wrap:wrap}.task-workspace-header>.actions{width:100%;justify-content:flex-end}.task-picker-wrap{width:100%;margin:0}.task-picker-wrap select{flex:1;max-width:none}.task-problem-pane,.task-editor-pane{padding:12px}.task-editor-pane .editor{height:48vh;min-height:320px;padding:11px;font-size:12px}.task-editor-pane .task-run-actions button{flex:1 1 auto}}

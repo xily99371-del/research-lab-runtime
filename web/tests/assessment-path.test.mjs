@@ -67,22 +67,12 @@ test('representative complexity guides have explicit time, space and rationale',
  for(const id of ['two_sum','bfs','dijkstra','attention','linear_regression_step','project_point','fps','chamfer_distance','contrastive_loss']){const g=COMPLEXITY_GUIDES[id];assert.ok(g,id);assert.ok(g.time.includes('O('));assert.ok(g.space.includes('O('));assert.ok(g.why.length>15);}
 });
 
-test('task center implements a distraction-free full-screen coding workspace',async()=>{
- const fs=await import('node:fs');
- const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
- const css=fs.readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
- assert.match(app,/进入沉浸式做题窗口/);
- assert.match(app,/退出/);
- assert.match(app,/上一题/);assert.match(app,/下一题/);
- assert.match(css,/\.task-focus-mode \.task-list\{display:none/);
- assert.match(css,/\.task-focus-mode \.task-run-actions\{position:sticky/);
- assert.match(css,/@media\(max-width:700px\)/);
-});
 
-test('immersive focus header keeps exit and navigation controls as visible siblings',async()=>{
+
+test('task center is a direct LeetCode-style two-pane workspace without a separate focus mode',async()=>{
  const fs=await import('node:fs');const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');const css=fs.readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
- assert.match(app,/box\('task-focus-bar',[\s\S]*?box\('task-focus-heading'[\s\S]*?box\('actions'/);
- assert.match(app,/window\.scrollTo\(0,0\);render\(\);window\.scrollTo\(0,0\)/);
- assert.match(css,/\.task-focus-mode \.layout\{position:fixed;inset:0/);
- assert.match(css,/\.task-focus-mode \.task-focus-bar\{z-index:100;top:0/);
+ assert.match(app,/task-problem-pane/);assert.match(app,/task-editor-pane/);assert.match(app,/task-workspace-header/);assert.match(app,/task-picker-wrap/);
+ assert.doesNotMatch(app,/进入沉浸式做题窗口/);assert.doesNotMatch(app,/task-focus-mode/);assert.doesNotMatch(app,/task-focus-bar/);
+ assert.match(css,/\.task-editor-pane \.task-run-actions\{position:static/);
+ assert.match(css,/\.task-grid\{display:grid;grid-template-columns/);
 });
