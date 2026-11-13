@@ -128,7 +128,7 @@ function renderCode(root){
  const langKey={'Python':'python','C++17':'cpp','ROS 2 Python':'ros2_python'};
  const ps=PROBLEMS.filter(p=>(taskTrack==='全部'||p.track===taskTrack)&&(taskLevel==='全部'||p.level===taskLevel)&&(taskPath==='全部'||TASK_META[p.id]?.pathTitle===taskPath)&&(taskLang==='全部'||p.langs.includes(langKey[taskLang]))&&(p.title+' '+p.desc+' '+p.concept+' '+(TASK_META[p.id]?.application||'')).toLowerCase().includes(taskQuery.toLowerCase())).sort((a,b)=>{if(taskPath==='全部')return 0;return (TASK_META[a.id]?.stage||99)-(TASK_META[b.id]?.stage||99);});
  if(!ps.some(p=>p.id===selectedTask))selectedTask=ps[0]?.id;
- const detail=box('task-grid'),problemPane=box('card task-problem-pane'),editorPane=box('card task-editor-pane');
+ const detail=box('task-grid'),problemPane=box('card task-problem-pane'),editorPane=box('card task-editor-pane');detail.append(problemPane,editorPane);
  const picker=el('select');picker.setAttribute('aria-label','选择评测题');for(const item of ps){const option=el('option',item.title);option.value=item.id;picker.append(option);}picker.value=selectedTask;picker.onchange=()=>{selectedTask=picker.value;render();};$('page').querySelector('.learn-toolbar')?.append(box('task-picker-wrap',el('label','当前题目'),picker));
  const p=PROBLEMS.find(p=>p.id===selectedTask);if(!p){detail.append(el('p','没有匹配的评测题。这个方向也可能有课程实践任务。'),btn('转到课程实践',()=>{taskMode='project';render();}));root.append(box('card task-grid',problemPane,editorPane));return;}
  if(!p.langs.includes(language))language=p.langs[0];if(taskLang!=='全部'&&p.langs.includes(langKey[taskLang]))language=langKey[taskLang];
