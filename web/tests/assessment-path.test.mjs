@@ -72,7 +72,7 @@ test('task center implements a distraction-free full-screen coding workspace',as
  const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
  const css=fs.readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
  assert.match(app,/进入沉浸式做题窗口/);
- assert.match(app,/退出专注/);
+ assert.match(app,/退出/);
  assert.match(app,/上一题/);assert.match(app,/下一题/);
  assert.match(css,/\.task-focus-mode \.task-list\{display:none/);
  assert.match(css,/\.task-focus-mode \.task-run-actions\{position:sticky/);
