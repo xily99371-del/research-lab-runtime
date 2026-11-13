@@ -78,3 +78,11 @@ test('task center implements a distraction-free full-screen coding workspace',as
  assert.match(css,/\.task-focus-mode \.task-run-actions\{position:sticky/);
  assert.match(css,/@media\(max-width:700px\)/);
 });
+
+test('immersive focus header keeps exit and navigation controls as visible siblings',async()=>{
+ const fs=await import('node:fs');const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');const css=fs.readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
+ assert.match(app,/box\('task-focus-bar',[\s\S]*?box\('task-focus-heading'[\s\S]*?box\('actions'/);
+ assert.match(app,/window\.scrollTo\(0,0\);render\(\);window\.scrollTo\(0,0\)/);
+ assert.match(css,/\.task-focus-mode \.layout\{position:fixed;inset:0/);
+ assert.match(css,/\.task-focus-mode \.task-focus-bar\{z-index:100;top:0/);
+});

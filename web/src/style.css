@@ -77,3 +77,17 @@ aside,nav{min-width:0}nav{max-width:100%}.layout{min-width:0}@media(max-width:80
  .task-focus-bar>.actions{flex:0 0 auto;min-width:0;gap:3px}
  .task-focus-bar button{min-width:0;white-space:nowrap;padding:6px 5px;font-size:9px}
 }
+
+/* LeetCode-style assessment focus header */
+.task-focus-mode .layout{position:fixed;inset:0;width:100%;height:100dvh;min-height:0;overflow:hidden}
+.task-focus-mode .task-detail{overscroll-behavior:contain}
+.task-focus-bar{position:sticky;top:0;margin:-22px calc(-1 * clamp(18px,4vw,64px)) 22px;padding:13px clamp(18px,4vw,64px);min-height:58px;box-sizing:border-box;width:auto}
+.task-focus-bar>.task-focus-heading{flex:1 1 auto}
+.task-focus-bar>.actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:nowrap;gap:8px}
+.task-focus-bar>.actions button{white-space:nowrap}
+.task-focus-mode .task-focus-bar{z-index:100;top:0;background:rgba(255,255,255,.98);box-shadow:0 2px 10px rgba(22,43,66,.06)}
+@media(max-width:700px){
+ .task-focus-bar{top:0;margin:-12px -12px 16px;padding:10px 12px;min-height:52px;width:auto}
+ .task-focus-bar>.task-focus-heading{flex:1 1 auto}
+ .task-focus-bar>.actions{display:flex;flex:0 0 auto;gap:4px}
+}
